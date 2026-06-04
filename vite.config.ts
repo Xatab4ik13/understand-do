@@ -8,8 +8,11 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   tanstackStart: {
-    // SPA mode: client-side only, no SSR. Produces a static index.html shell.
-    spa: { enabled: true },
+    // SPA mode: client-side only, no SSR. Shell prerendered as index.html.
+    spa: {
+      enabled: true,
+      prerender: { outputPath: "/" },
+    },
     server: { entry: "server" },
   },
   // Static build for plain-static hosting (Timeweb App Platform "React").
