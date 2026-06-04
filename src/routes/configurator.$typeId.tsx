@@ -508,14 +508,9 @@ function ConfiguratorPage() {
             </CardContent>
           </Card>
 
-          <div className="flex gap-2">
-            <Button onClick={onCopy} variant="outline" className="flex-1">
-              <Copy className="mr-2 h-4 w-4" /> Скопировать
-            </Button>
-            <Button onClick={onDownload} className="flex-1">
-              Скачать заказ
-            </Button>
-          </div>
+          <Button onClick={onDownloadPdf} className="w-full">
+            <Download className="mr-2 h-4 w-4" /> Скачать PDF
+          </Button>
         </aside>
       </main>
     </div>
