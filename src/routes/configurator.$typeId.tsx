@@ -31,9 +31,8 @@ export const Route = createFileRoute("/configurator/$typeId")({
     <div className="p-8 text-center">Тип перегородки не найден</div>
   ),
   loader: ({ params }) => {
-    const type = getPartitionType(params.typeId);
-    if (!type) throw notFound();
-    return { type };
+    if (!getPartitionType(params.typeId)) throw notFound();
+    return { typeId: params.typeId };
   },
 });
 
