@@ -342,18 +342,20 @@ function ConfiguratorPage() {
               <CardTitle className="text-base">Проекция</CardTitle>
             </CardHeader>
             <CardContent>
-              <PartitionProjection
-                type={type}
-                openingHeight={s.openingHeight}
-                openingWidth={s.openingWidth}
-                sashWidth={result.sashWidth}
-                sashHeight={result.sashHeight}
-                glassId={s.glassId}
-                profileId={s.profileId}
-                modelId={s.modelId}
-                openings={s.openings}
-                handlePositions={s.handlePositions}
-              />
+              <div ref={projectionWrapRef}>
+                <PartitionProjection
+                  type={type}
+                  openingHeight={s.openingHeight}
+                  openingWidth={s.openingWidth}
+                  sashWidth={result.sashWidth}
+                  sashHeight={result.sashHeight}
+                  glassId={s.glassId}
+                  profileId={s.profileId}
+                  modelId={s.modelId}
+                  openings={s.openings}
+                  handlePositions={s.handlePositions}
+                />
+              </div>
             </CardContent>
           </Card>
 
