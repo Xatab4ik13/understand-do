@@ -328,6 +328,78 @@ export function PartitionProjection({
                 pointerEvents="none"
               />
 
+              {/* Импосты (раскладка по модели ALP) */}
+              {mullions.map((m, mi) => {
+                if (m.type === "h") {
+                  const yy = innerY + innerH * m.y;
+                  const x1 = innerX + innerW * (m.x1 ?? 0);
+                  const x2 = innerX + innerW * (m.x2 ?? 1);
+                  return (
+                    <g key={`m-${mi}`}>
+                      <line
+                        x1={x1}
+                        y1={yy}
+                        x2={x2}
+                        y2={yy}
+                        stroke={prof.dark}
+                        strokeWidth={mullT + 1}
+                        strokeOpacity={0.85}
+                      />
+                      <line
+                        x1={x1}
+                        y1={yy}
+                        x2={x2}
+                        y2={yy}
+                        stroke={`url(#${uid}-profGrad)`}
+                        strokeWidth={mullT}
+                      />
+                      <line
+                        x1={x1}
+                        y1={yy - mullT / 2 + 0.5}
+                        x2={x2}
+                        y2={yy - mullT / 2 + 0.5}
+                        stroke={prof.light}
+                        strokeOpacity={0.5}
+                        strokeWidth={0.6}
+                      />
+                    </g>
+                  );
+                }
+                const xx = innerX + innerW * m.x;
+                const y1 = innerY + innerH * (m.y1 ?? 0);
+                const y2 = innerY + innerH * (m.y2 ?? 1);
+                return (
+                  <g key={`m-${mi}`}>
+                    <line
+                      x1={xx}
+                      y1={y1}
+                      x2={xx}
+                      y2={y2}
+                      stroke={prof.dark}
+                      strokeWidth={mullT + 1}
+                      strokeOpacity={0.85}
+                    />
+                    <line
+                      x1={xx}
+                      y1={y1}
+                      x2={xx}
+                      y2={y2}
+                      stroke={`url(#${uid}-profGrad)`}
+                      strokeWidth={mullT}
+                    />
+                    <line
+                      x1={xx - mullT / 2 + 0.5}
+                      y1={y1}
+                      x2={xx - mullT / 2 + 0.5}
+                      y2={y2}
+                      stroke={prof.light}
+                      strokeOpacity={0.5}
+                      strokeWidth={0.6}
+                    />
+                  </g>
+                );
+              })}
+
               {/* Профильная рамка */}
               {drawProfileFrame(sx, sy, sashPxW, drawH, `frame-${i}`)}
 
