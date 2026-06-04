@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getPartitionType, type PartitionType } from "@/lib/configurator/types";
 import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
@@ -17,10 +17,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, AlertTriangle, Copy } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { PartitionProjection } from "@/components/configurator/PartitionProjection";
+import { exportOrderToPdf } from "@/lib/configurator/exportPdf";
+import logoAsset from "@/assets/logo.svg.asset.json";
 
 export const Route = createFileRoute("/configurator/$typeId")({
   head: ({ params }) => ({
