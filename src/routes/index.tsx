@@ -3,6 +3,7 @@ import { PARTITION_TYPES } from "@/lib/configurator/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatRub } from "@/lib/configurator/calculate";
 import { TypeScheme } from "@/components/configurator/TypeScheme";
+import logoAsset from "@/assets/logo.svg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,7 +20,12 @@ function Index() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="mx-auto max-w-6xl px-6 py-6">
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <img
+            src={logoAsset.url}
+            alt="Логотип"
+            className="h-20 w-auto md:h-24"
+          />
+          <h1 className="mt-6 text-2xl font-semibold tracking-tight">
             Конфигуратор перегородок
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
