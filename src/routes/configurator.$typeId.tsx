@@ -64,8 +64,8 @@ function ConfiguratorPage() {
   const type = getPartitionType(typeId)!;
 
   const [s, setS] = useState<Selections>(() => ({
-    openingHeight: 2200,
-    openingWidth: 1500,
+    openingHeight: 0,
+    openingWidth: 0,
     glassId: GLASSES[4].id,
     profileId: PROFILES[0].id,
     modelId: PARTITION_MODELS[0].id,
