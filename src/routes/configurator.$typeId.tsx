@@ -138,39 +138,54 @@ function ConfiguratorPage() {
 
   const maxH = maxOpeningHeight(type, s.glassId);
 
-  const summary = buildSummary(type.name, s, result);
+  const summaryLines = useMemo(
+    () => buildSummaryLines(type.name, s, result),
+    [type, s, result],
+  );
 
-  const onCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(summary);
-      toast.success("Конфигурация скопирована");
-    } catch {
-      toast.error("Не удалось скопировать");
+  const projectionWrapRef = useRef<HTMLDivElement | null>(null);
+
+  const onDownloadPdf = async () => {
+    const svg = projectionWrapRef.current?.querySelector("svg") as
+      | SVGSVGElement
+      | null;
+    if (!svg) {
+      toast.error("Не удалось получить проекцию");
+      return;
     }
-  };
-
-  const onDownload = () => {
-    const blob = new Blob([summary], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${type.id}-заказ.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      await exportOrderToPdf({
+        fileName: `${type.id}-заказ.pdf`,
+        projectionSvg: svg,
+        title: type.name,
+        lines: summaryLines,
+      });
+      toast.success("PDF сохранён");
+    } catch (e) {
+      console.error(e);
+      toast.error("Не удалось сформировать PDF");
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Toaster richColors />
       <header className="border-b">
-        <div className="mx-auto max-w-6xl px-6 py-4">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" /> К выбору типа
-          </Link>
-          <h1 className="mt-2 text-xl font-semibold">{type.name}</h1>
+        <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
+          <img
+            src={logoAsset.url}
+            alt="Логотип"
+            className="h-16 w-auto md:h-20"
+          />
+          <div className="min-w-0 flex-1">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" /> К выбору типа
+            </Link>
+            <h1 className="mt-1 truncate text-xl font-semibold">{type.name}</h1>
+          </div>
         </div>
       </header>
 
