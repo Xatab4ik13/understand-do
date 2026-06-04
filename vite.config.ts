@@ -10,7 +10,7 @@ export default defineConfig({
   tanstackStart: {
     spa: {
       enabled: true,
-      prerender: { outputPath: "/" },
+      prerender: { outputPath: "/index" },
     },
     server: { entry: "server" },
   },
