@@ -50,7 +50,18 @@ function profileColor(profileId: string): string {
   if (n.includes("золот")) return "#b08a3e";
   if (n.includes("шамп")) return "#a89377";
   if (n.includes("бел")) return "#e8e8e8";
-  return "#5b6168"; // matt серебристый/алюм
+  return "#5b6168";
+}
+
+/** Затемнить hex-цвет на коэффициент 0..1 (1 = чёрный) */
+function shade(hex: string, k: number): string {
+  const m = hex.replace("#", "");
+  const r = parseInt(m.substring(0, 2), 16);
+  const g = parseInt(m.substring(2, 4), 16);
+  const b = parseInt(m.substring(4, 6), 16);
+  const f = (v: number) => Math.max(0, Math.min(255, Math.round(v * (1 - k))));
+  const to = (v: number) => f(v).toString(16).padStart(2, "0");
+  return `#${to(r)}${to(g)}${to(b)}`;
 }
 
 export function PartitionProjection({
@@ -64,27 +75,50 @@ export function PartitionProjection({
   openings,
   handlePositions,
 }: Props) {
-  // Каркас рисования
-  const PAD = 56; // отступ под подписи размеров
-  const MAX_W = 720;
-  const MAX_H = 360;
+  // ---- Каркас ----
+  // Большие отступы под размерные линии + место для receding-плоскостей сверху/справа
+  const PAD_L = 72;
+  const PAD_R = 72;
+  const PAD_T = 60;
+  const PAD_B = 72;
+
+  const MAX_W = 780;
+  const MAX_H = 420;
+
+  // Глубина проекции (cabinet projection, угол 30°, depth 28px)
+  const depth = 28;
+  const angle = (30 * Math.PI) / 180;
+  const dx = depth * Math.cos(angle); // ≈ 24.2 — вправо
+  const dy = -depth * Math.sin(angle); // ≈ -14 — вверх
+
   const ratio = openingWidth > 0 && openingHeight > 0 ? openingWidth / openingHeight : 1.5;
-  let drawW = MAX_W - PAD * 2;
+  // Доступная зона для фронтальной грани (исключая receding)
+  const availW = MAX_W - PAD_L - PAD_R - dx;
+  const availH = MAX_H - PAD_T - PAD_B + dy; // dy отрицательный, поэтому "+dy"
+
+  let drawW = availW;
   let drawH = drawW / ratio;
-  if (drawH > MAX_H - PAD * 2) {
-    drawH = MAX_H - PAD * 2;
+  if (drawH > availH) {
+    drawH = availH;
     drawW = drawH * ratio;
   }
-  const W = drawW + PAD * 2;
-  const H = drawH + PAD * 2;
-  const x0 = PAD;
-  const y0 = PAD;
+
+  const W = MAX_W;
+  const H = MAX_H;
+  const x0 = PAD_L;
+  const y0 = PAD_T - dy; // опускаем фронт-грань, чтобы receding-плоскость уместилась сверху
 
   const glass = glassFill(glassId);
   const profile = profileColor(profileId);
+  const profileTop = shade(profile, 0.18); // верх — чуть темнее (свет сверху-слева)
+  const profileSide = shade(profile, 0.32); // правая грань — ещё темнее
+
   const sashCount = type.sashCount;
   const sashPxW = drawW / sashCount;
   const frameT = Math.max(4, Math.min(10, drawW * 0.012));
+
+  // ---- Helpers для размерных линий ----
+  const dimColor = "hsl(var(--muted-foreground))";
 
   return (
     <div className="w-full overflow-x-auto">
@@ -93,7 +127,7 @@ export function PartitionProjection({
         className="w-full max-w-full"
         style={{ height: "auto" }}
         role="img"
-        aria-label="Проекция перегородки"
+        aria-label="Изометрическая проекция перегородки"
       >
         <defs>
           <linearGradient id="mirrorGrad" x1="0" y1="0" x2="1" y2="1">
@@ -122,37 +156,45 @@ export function PartitionProjection({
             <rect width="10" height="10" fill="#d6dde0" />
             <path d="M0 5 L5 0 L10 5 L5 10 Z" fill="none" stroke="#bcc6ca" strokeWidth="0.8" />
           </pattern>
-          <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="hsl(var(--muted))" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="hsl(var(--muted))" stopOpacity="0" />
+          {/* Блик на стекле (диагональный) */}
+          <linearGradient id="glassSheen" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="white" stopOpacity="0.18" />
+            <stop offset="45%" stopColor="white" stopOpacity="0" />
+            <stop offset="100%" stopColor="white" stopOpacity="0.08" />
+          </linearGradient>
+          {/* Тень от перегородки на полу */}
+          <linearGradient id="floorShadow" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="black" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="black" stopOpacity="0" />
           </linearGradient>
         </defs>
 
-        {/* Тень-пол */}
-        <ellipse
-          cx={x0 + drawW / 2}
-          cy={y0 + drawH + 14}
-          rx={drawW * 0.48}
-          ry={6}
-          fill="black"
-          opacity={0.08}
+        {/* ===== Тень-пол (параллелограмм, уходит назад) ===== */}
+        <polygon
+          points={[
+            `${x0},${y0 + drawH}`,
+            `${x0 + drawW},${y0 + drawH}`,
+            `${x0 + drawW + dx},${y0 + drawH + dy}`,
+            `${x0 + dx},${y0 + drawH + dy}`,
+          ].join(" ")}
+          fill="url(#floorShadow)"
+          opacity={0.55}
         />
 
-        {/* Створки */}
+        {/* ===== Створки ===== */}
         {Array.from({ length: sashCount }).map((_, i) => {
           const sx = x0 + i * sashPxW;
           const sy = y0;
           const sash = type.sashes[i];
           const opening = openings[i] as OpeningOption | undefined;
           const positions = handlePositions[i] ?? [];
+          const isLast = i === sashCount - 1;
 
-          // Эффективная заливка
           let fillRef = glass.fill;
           if (glass.pattern === "satin") fillRef = "url(#satinPat)";
           if (glass.pattern === "moru") fillRef = "url(#moruPat)";
           if (glass.pattern === "kafedral") fillRef = "url(#kafedralPat)";
 
-          // Координаты ручек: 2=верх-лево, 3=верх-право, 1=низ-лево, 4=низ-право
           const innerX = sx + frameT;
           const innerY = sy + frameT;
           const innerW = sashPxW - frameT * 2;
@@ -170,7 +212,35 @@ export function PartitionProjection({
 
           return (
             <g key={i}>
-              {/* Стекло */}
+              {/* Верхняя receding-грань (торец рамы сверху) */}
+              <polygon
+                points={[
+                  `${sx},${sy}`,
+                  `${sx + sashPxW},${sy}`,
+                  `${sx + sashPxW + dx},${sy + dy}`,
+                  `${sx + dx},${sy + dy}`,
+                ].join(" ")}
+                fill={profileTop}
+                stroke={shade(profile, 0.4)}
+                strokeWidth={0.6}
+              />
+
+              {/* Правая receding-грань только у последней створки */}
+              {isLast && (
+                <polygon
+                  points={[
+                    `${sx + sashPxW},${sy}`,
+                    `${sx + sashPxW + dx},${sy + dy}`,
+                    `${sx + sashPxW + dx},${sy + drawH + dy}`,
+                    `${sx + sashPxW},${sy + drawH}`,
+                  ].join(" ")}
+                  fill={profileSide}
+                  stroke={shade(profile, 0.5)}
+                  strokeWidth={0.6}
+                />
+              )}
+
+              {/* Стекло (фронт) */}
               <rect
                 x={innerX}
                 y={innerY}
@@ -179,7 +249,17 @@ export function PartitionProjection({
                 fill={fillRef}
                 opacity={glass.opacity}
               />
-              {/* Профиль (рамка створки) */}
+              {/* Блик на стекле */}
+              <rect
+                x={innerX}
+                y={innerY}
+                width={innerW}
+                height={innerH}
+                fill="url(#glassSheen)"
+                pointerEvents="none"
+              />
+
+              {/* Профиль (рамка створки, фронт) */}
               <rect
                 x={sx + frameT / 2}
                 y={sy + frameT / 2}
@@ -192,7 +272,7 @@ export function PartitionProjection({
 
               {/* Индикатор открывания / стационара */}
               {opening === "Стационар" ? (
-                <g opacity={0.55}>
+                <g opacity={0.5}>
                   <line
                     x1={innerX + 8}
                     y1={innerY + 8}
@@ -211,16 +291,6 @@ export function PartitionProjection({
                     strokeWidth={1}
                     strokeDasharray="4 4"
                   />
-                  <text
-                    x={sx + sashPxW / 2}
-                    y={sy + drawH / 2 + 4}
-                    textAnchor="middle"
-                    fontSize="11"
-                    fill="hsl(var(--muted-foreground))"
-                    fontFamily="ui-sans-serif, system-ui"
-                  >
-                    стационар
-                  </text>
                 </g>
               ) : (
                 <g opacity={0.7}>
@@ -280,84 +350,155 @@ export function PartitionProjection({
                     </g>
                   );
                 })}
-
-              {/* Номер створки */}
-              <text
-                x={sx + sashPxW / 2}
-                y={sy + 14}
-                textAnchor="middle"
-                fontSize="10"
-                fill="hsl(var(--muted-foreground))"
-                fontFamily="ui-sans-serif, system-ui"
-              >
-                {i + 1}
-              </text>
             </g>
           );
         })}
 
-        {/* Подпись ширины (низ) */}
-        <g fontFamily="ui-sans-serif, system-ui" fontSize="11" fill="hsl(var(--muted-foreground))">
-          <line
-            x1={x0}
-            y1={y0 + drawH + 30}
-            x2={x0 + drawW}
-            y2={y0 + drawH + 30}
-            stroke="currentColor"
-            strokeWidth={0.8}
-          />
-          <line x1={x0} y1={y0 + drawH + 26} x2={x0} y2={y0 + drawH + 34} stroke="currentColor" />
+        {/* ===== РАЗМЕРНЫЕ ЛИНИИ ===== */}
+        {/* Общая ширина проёма (снизу) */}
+        <g
+          fontFamily="ui-sans-serif, system-ui"
+          fontSize="11"
+          fill={dimColor}
+          stroke={dimColor}
+        >
+          {/* Выносные линии */}
+          <line x1={x0} y1={y0 + drawH + 4} x2={x0} y2={y0 + drawH + 44} strokeWidth={0.6} />
           <line
             x1={x0 + drawW}
-            y1={y0 + drawH + 26}
+            y1={y0 + drawH + 4}
             x2={x0 + drawW}
-            y2={y0 + drawH + 34}
-            stroke="currentColor"
+            y2={y0 + drawH + 44}
+            strokeWidth={0.6}
           />
-          <text x={x0 + drawW / 2} y={y0 + drawH + 46} textAnchor="middle">
+          {/* Размерная линия */}
+          <line
+            x1={x0}
+            y1={y0 + drawH + 36}
+            x2={x0 + drawW}
+            y2={y0 + drawH + 36}
+            strokeWidth={0.8}
+          />
+          {/* Засечки */}
+          <line
+            x1={x0 - 4}
+            y1={y0 + drawH + 32}
+            x2={x0 + 4}
+            y2={y0 + drawH + 40}
+            strokeWidth={0.8}
+          />
+          <line
+            x1={x0 + drawW - 4}
+            y1={y0 + drawH + 32}
+            x2={x0 + drawW + 4}
+            y2={y0 + drawH + 40}
+            strokeWidth={0.8}
+          />
+          {/* Текст в разрыве линии */}
+          <rect
+            x={x0 + drawW / 2 - 34}
+            y={y0 + drawH + 28}
+            width={68}
+            height={16}
+            fill="hsl(var(--background))"
+            stroke="none"
+          />
+          <text
+            x={x0 + drawW / 2}
+            y={y0 + drawH + 40}
+            textAnchor="middle"
+            stroke="none"
+            fontWeight={500}
+          >
             {openingWidth} мм
           </text>
         </g>
 
-        {/* Подпись высоты (слева) */}
-        <g fontFamily="ui-sans-serif, system-ui" fontSize="11" fill="hsl(var(--muted-foreground))">
+        {/* Высота проёма (слева) */}
+        <g
+          fontFamily="ui-sans-serif, system-ui"
+          fontSize="11"
+          fill={dimColor}
+          stroke={dimColor}
+        >
+          <line x1={x0 - 4} y1={y0} x2={x0 - 44} y2={y0} strokeWidth={0.6} />
           <line
-            x1={x0 - 22}
-            y1={y0}
-            x2={x0 - 22}
+            x1={x0 - 4}
+            y1={y0 + drawH}
+            x2={x0 - 44}
             y2={y0 + drawH}
-            stroke="currentColor"
+            strokeWidth={0.6}
+          />
+          <line x1={x0 - 36} y1={y0} x2={x0 - 36} y2={y0 + drawH} strokeWidth={0.8} />
+          <line x1={x0 - 40} y1={y0 - 4} x2={x0 - 32} y2={y0 + 4} strokeWidth={0.8} />
+          <line
+            x1={x0 - 40}
+            y1={y0 + drawH - 4}
+            x2={x0 - 32}
+            y2={y0 + drawH + 4}
             strokeWidth={0.8}
           />
-          <line x1={x0 - 26} y1={y0} x2={x0 - 18} y2={y0} stroke="currentColor" />
-          <line
-            x1={x0 - 26}
-            y1={y0 + drawH}
-            x2={x0 - 18}
-            y2={y0 + drawH}
-            stroke="currentColor"
+          <rect
+            x={x0 - 52}
+            y={y0 + drawH / 2 - 8}
+            width={32}
+            height={16}
+            fill="hsl(var(--background))"
+            stroke="none"
           />
           <text
-            x={x0 - 30}
+            x={x0 - 36}
             y={y0 + drawH / 2}
             textAnchor="middle"
-            transform={`rotate(-90 ${x0 - 30} ${y0 + drawH / 2})`}
+            stroke="none"
+            fontWeight={500}
+            transform={`rotate(-90 ${x0 - 36} ${y0 + drawH / 2})`}
           >
             {openingHeight} мм
           </text>
         </g>
 
-        {/* Подпись створки */}
-        <text
-          x={x0 + drawW / 2}
-          y={y0 - 16}
-          textAnchor="middle"
-          fontSize="11"
-          fill="hsl(var(--muted-foreground))"
+        {/* Ширина одной створки (сверху, над первой) */}
+        <g
           fontFamily="ui-sans-serif, system-ui"
+          fontSize="10"
+          fill={dimColor}
+          stroke={dimColor}
         >
-          створка {Math.round(sashWidth)} × {Math.round(sashHeight)} мм
-        </text>
+          <line x1={x0} y1={y0 - 4} x2={x0} y2={y0 - 26} strokeWidth={0.5} />
+          <line
+            x1={x0 + sashPxW}
+            y1={y0 - 4}
+            x2={x0 + sashPxW}
+            y2={y0 - 26}
+            strokeWidth={0.5}
+          />
+          <line x1={x0} y1={y0 - 20} x2={x0 + sashPxW} y2={y0 - 20} strokeWidth={0.6} />
+          <line x1={x0 - 3} y1={y0 - 23} x2={x0 + 3} y2={y0 - 17} strokeWidth={0.6} />
+          <line
+            x1={x0 + sashPxW - 3}
+            y1={y0 - 23}
+            x2={x0 + sashPxW + 3}
+            y2={y0 - 17}
+            strokeWidth={0.6}
+          />
+          <rect
+            x={x0 + sashPxW / 2 - 30}
+            y={y0 - 28}
+            width={60}
+            height={14}
+            fill="hsl(var(--background))"
+            stroke="none"
+          />
+          <text
+            x={x0 + sashPxW / 2}
+            y={y0 - 17}
+            textAnchor="middle"
+            stroke="none"
+          >
+            створка {Math.round(sashWidth)}
+          </text>
+        </g>
       </svg>
     </div>
   );
