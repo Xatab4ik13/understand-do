@@ -258,14 +258,20 @@ export function PartitionProjection({
           const innerY = sy + frameT;
           const innerW = sashPxW - frameT * 2;
           const innerH = drawH - frameT * 2;
-          const hOffX = Math.min(20, innerW * 0.1);
-          const hOffY = Math.min(34, innerH * 0.16);
+          // Отступы ручки от рамы (внутри стекла).
+          // По вертикали — отступ побольше, чтобы ручка читалась как
+          // фурнитура, а не как уголок профиля. По горизонтали — ближе к
+          // кромке створки (там, где ручка реально стоит).
+          const hOffX = Math.max(14, Math.min(26, innerW * 0.09));
+          const hOffY = Math.max(40, Math.min(70, innerH * 0.22));
           const handleCoord = (pos: number) => {
+            // 2 = верх-лево, 3 = верх-право, 1 = низ-лево, 4 = низ-право
             const left = pos === 1 || pos === 2;
             const top = pos === 2 || pos === 3;
             return {
               x: left ? innerX + hOffX : innerX + innerW - hOffX,
               y: top ? innerY + hOffY : innerY + innerH - hOffY,
+              left,
             };
           };
 
@@ -372,50 +378,74 @@ export function PartitionProjection({
                 </g>
               )}
 
-              {/* Ручки */}
+              {/* Ручки: розетка + горизонтальный рычаг внутрь створки */}
               {sash?.hasHandle &&
                 positions.map((pos) => {
-                  const { x, y } = handleCoord(pos);
+                  const { x, y, left } = handleCoord(pos);
+                  // рычаг направлен ОТ ближайшей вертикальной кромки внутрь
+                  const leverLen = Math.max(22, Math.min(34, innerW * 0.16));
+                  const dir = left ? 1 : -1;
+                  const leverX1 = x;
+                  const leverX2 = x + dir * leverLen;
+                  const leverY = y;
                   return (
                     <g key={pos}>
-                      {/* Скоба */}
-                      <rect
-                        x={x - 2.5}
-                        y={y - 18}
-                        width={5}
-                        height={36}
-                        rx={2.5}
+                      {/* Тень под фурнитурой */}
+                      <ellipse
+                        cx={x + dir * leverLen * 0.45}
+                        cy={leverY + 2}
+                        rx={leverLen * 0.55}
+                        ry={2}
+                        fill="black"
+                        opacity={0.18}
+                      />
+                      {/* Рычаг */}
+                      <line
+                        x1={leverX1}
+                        y1={leverY}
+                        x2={leverX2}
+                        y2={leverY}
+                        stroke={`url(#${uid}-profGrad)`}
+                        strokeWidth={3.2}
+                        strokeLinecap="round"
+                      />
+                      {/* Тёмный контур рычага */}
+                      <line
+                        x1={leverX1}
+                        y1={leverY}
+                        x2={leverX2}
+                        y2={leverY}
+                        stroke={prof.dark}
+                        strokeOpacity={0.55}
+                        strokeWidth={0.8}
+                        strokeLinecap="round"
+                      />
+                      {/* Блик на рычаге */}
+                      <line
+                        x1={leverX1 + dir * 3}
+                        y1={leverY - 0.9}
+                        x2={leverX2 - dir * 3}
+                        y2={leverY - 0.9}
+                        stroke={prof.light}
+                        strokeOpacity={0.75}
+                        strokeWidth={0.6}
+                        strokeLinecap="round"
+                      />
+                      {/* Розетка (накладка на стекло) */}
+                      <circle
+                        cx={x}
+                        cy={y}
+                        r={4.2}
                         fill={`url(#${uid}-profGrad)`}
                         stroke={prof.dark}
-                        strokeWidth={0.6}
+                        strokeWidth={0.8}
                       />
-                      {/* Блик на скобе */}
-                      <line
-                        x1={x - 1}
-                        y1={y - 16}
-                        x2={x - 1}
-                        y2={y + 16}
-                        stroke={prof.light}
-                        strokeOpacity={0.7}
-                        strokeWidth={0.6}
-                      />
-                      {/* Верхнее крепление */}
                       <circle
-                        cx={x}
-                        cy={y - 14}
-                        r={2.5}
-                        fill={prof.base}
-                        stroke={prof.dark}
-                        strokeWidth={0.6}
-                      />
-                      {/* Нижнее крепление */}
-                      <circle
-                        cx={x}
-                        cy={y + 14}
-                        r={2.5}
-                        fill={prof.base}
-                        stroke={prof.dark}
-                        strokeWidth={0.6}
+                        cx={x - 0.8}
+                        cy={y - 0.8}
+                        r={1.2}
+                        fill={prof.light}
+                        opacity={0.7}
                       />
                     </g>
                   );
