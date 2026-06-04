@@ -1,0 +1,451 @@
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { getPartitionType, type PartitionType } from "@/lib/configurator/types";
+import { GLASSES } from "@/lib/configurator/glasses";
+import { PROFILES } from "@/lib/configurator/profiles";
+import { HANDLE_MODELS } from "@/lib/configurator/models";
+import { HANDLE_COUNT_PRICES, SETS } from "@/lib/configurator/sets";
+import { calculate, formatRub, type Selections } from "@/lib/configurator/calculate";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, AlertTriangle, Copy } from "lucide-react";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
+
+export const Route = createFileRoute("/configurator/$typeId")({
+  head: ({ params }) => ({
+    meta: [{ title: `Конфигуратор — ${params.typeId}` }],
+  }),
+  component: ConfiguratorPage,
+  notFoundComponent: () => (
+    <div className="p-8 text-center">Тип перегородки не найден</div>
+  ),
+  loader: ({ params }) => {
+    const type = getPartitionType(params.typeId);
+    if (!type) throw notFound();
+    return { type };
+  },
+});
+
+function ConfiguratorPage() {
+  const { type } = Route.useLoaderData() as { type: PartitionType };
+
+  const [s, setS] = useState<Selections>(() => ({
+    openingHeight: 2200,
+    openingWidth: 1500,
+    glassId: GLASSES[4].id, // Стекло 4мм
+    profileId: PROFILES[0].id,
+    modelId: HANDLE_MODELS[0].id,
+    setIds: type.sashes.map((sash) => sash.allowedSets[0]),
+    openings: type.sashes.map((sash) => sash.allowedOpenings[0]),
+    handleCount: Math.min(type.sashCount, type.maxHandleCount) || 1,
+  }));
+
+  const result = useMemo(() => calculate(type, s), [type, s]);
+
+  const updateSet = (idx: number, value: string) => {
+    setS((prev) => ({
+      ...prev,
+      setIds: prev.setIds.map((v, i) => (i === idx ? value : v)),
+    }));
+  };
+  const updateOpening = (idx: number, value: string) => {
+    setS((prev) => ({
+      ...prev,
+      openings: prev.openings.map((v, i) => (i === idx ? value : v)),
+    }));
+  };
+
+  const handleCountOptions = Array.from(
+    { length: type.maxHandleCount },
+    (_, i) => i + 1,
+  );
+
+  const summary = buildSummary(type.name, s, result);
+
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(summary);
+      toast.success("Конфигурация скопирована");
+    } catch {
+      toast.error("Не удалось скопировать");
+    }
+  };
+
+  const onDownload = () => {
+    const blob = new Blob([summary], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${type.id}-заказ.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Toaster richColors />
+      <header className="border-b">
+        <div className="mx-auto max-w-6xl px-6 py-4">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" /> К выбору типа
+          </Link>
+          <h1 className="mt-2 text-xl font-semibold">{type.name}</h1>
+        </div>
+      </header>
+
+      <main className="mx-auto grid max-w-6xl gap-6 px-6 py-6 lg:grid-cols-[1fr_360px]">
+        {/* Форма */}
+        <div className="space-y-6">
+          {/* Размеры проёма */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Перегородка</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4 sm:grid-cols-2">
+              <Field label="Высота проёма (мм)">
+                <Input
+                  type="number"
+                  value={s.openingHeight || ""}
+                  onChange={(e) =>
+                    setS({ ...s, openingHeight: Number(e.target.value) || 0 })
+                  }
+                />
+              </Field>
+              <Field label="Ширина проёма (мм)">
+                <Input
+                  type="number"
+                  value={s.openingWidth || ""}
+                  onChange={(e) =>
+                    setS({ ...s, openingWidth: Number(e.target.value) || 0 })
+                  }
+                />
+              </Field>
+              <ReadOnly
+                label="Высота створки"
+                value={`${Math.round(result.sashHeight)} мм`}
+              />
+              <ReadOnly
+                label="Ширина створки"
+                value={`${Math.round(result.sashWidth)} мм`}
+              />
+              <ReadOnly
+                label={`Кв.м (×${type.sashCount} створ.)`}
+                value={`${result.totalSqm.toFixed(3)} м²`}
+              />
+
+              <Field label="Выбор стекла">
+                <Select
+                  value={s.glassId}
+                  onValueChange={(v) => setS({ ...s, glassId: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GLASSES.map((g) => (
+                      <SelectItem key={g.id} value={g.id}>
+                        {g.name} — {formatRub(g.pricePerSqm)}/м²
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+
+              <Field label="Цвет профиля">
+                <Select
+                  value={s.profileId}
+                  onValueChange={(v) => setS({ ...s, profileId: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROFILES.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.code} — {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+            </CardContent>
+          </Card>
+
+          {/* Комплектация */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Комплектация</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4 sm:grid-cols-2">
+              <Field label="Модель ручки">
+                <Select
+                  value={s.modelId}
+                  onValueChange={(v) => setS({ ...s, modelId: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {HANDLE_MODELS.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.code} {m.price > 0 ? `(+${formatRub(m.price)})` : "(базовая)"}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+
+              <Field label="Количество ручек">
+                <Select
+                  value={String(s.handleCount)}
+                  onValueChange={(v) => setS({ ...s, handleCount: Number(v) })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {handleCountOptions.map((n) => (
+                      <SelectItem key={n} value={String(n)}>
+                        {n} {n === 1 ? "ручка" : n < 5 ? "ручки" : "ручек"} —{" "}
+                        {formatRub(HANDLE_COUNT_PRICES[n] ?? 0)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+            </CardContent>
+          </Card>
+
+          {/* Створки */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Створки</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {type.sashes.map((sash, idx) => (
+                <div
+                  key={idx}
+                  className="grid gap-3 rounded-md border p-3 sm:grid-cols-2"
+                >
+                  <div className="sm:col-span-2 text-sm font-medium">
+                    Створка {idx + 1}{" "}
+                    {!sash.hasHandle && (
+                      <span className="text-muted-foreground">(без ручки)</span>
+                    )}
+                  </div>
+                  <Field label="Система">
+                    <Select
+                      value={s.setIds[idx]}
+                      onValueChange={(v) => updateSet(idx, v)}
+                      disabled={sash.allowedSets.length === 1}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sash.allowedSets.map((setId) => {
+                          const set = SETS[setId];
+                          return (
+                            <SelectItem key={setId} value={setId}>
+                              {set.name} — {formatRub(set.price)}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                  <Field label="Открывание">
+                    <Select
+                      value={s.openings[idx]}
+                      onValueChange={(v) => updateOpening(idx, v)}
+                      disabled={sash.allowedOpenings.length === 1}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sash.allowedOpenings.map((o) => (
+                          <SelectItem key={o} value={o}>
+                            {o}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Итог */}
+        <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Расчёт</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <Row label="Базовая цена" value={formatRub(type.basePrice)} />
+              <Row
+                label={`Стекло × ${result.totalSqm.toFixed(2)} м²`}
+                value={formatRub(result.glassPrice * result.totalSqm)}
+              />
+              <Row
+                label={`Модель × ${type.sashCount}`}
+                value={formatRub(result.modelsPrice)}
+              />
+              <Row label="Системы" value={formatRub(result.setsPrice)} />
+              <Row label="Ручки" value={formatRub(result.handlesPrice)} />
+              <div className="my-2 border-t" />
+              <Row label="Цена" value={formatRub(result.totalPrice)} bold />
+              {result.isNonStandard && (
+                <Row
+                  label="Наценка нестандарт +30%"
+                  value={formatRub(result.nonStandardMarkup)}
+                />
+              )}
+              <Row
+                label="Цена общая"
+                value={formatRub(result.totalWithMarkup)}
+                bold
+              />
+              <div className="my-2 border-t" />
+              <Row
+                label="Цена РРЦ (+70%)"
+                value={formatRub(result.rrcPrice)}
+                accent
+              />
+
+              {result.warnings.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {result.warnings.map((w, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-2 rounded-md bg-yellow-50 p-2 text-xs text-yellow-900 dark:bg-yellow-950 dark:text-yellow-200"
+                    >
+                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                      <span>{w}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {result.errors.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {result.errors.map((e, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-2 rounded-md bg-destructive/10 p-2 text-xs text-destructive"
+                    >
+                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                      <span>{e}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="flex gap-2">
+            <Button onClick={onCopy} variant="outline" className="flex-1">
+              <Copy className="mr-2 h-4 w-4" /> Скопировать
+            </Button>
+            <Button onClick={onDownload} className="flex-1">
+              Скачать заказ
+            </Button>
+          </div>
+        </aside>
+      </main>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      {children}
+    </div>
+  );
+}
+
+function ReadOnly({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <div className="rounded-md border bg-muted/40 px-3 py-2 text-sm">{value}</div>
+    </div>
+  );
+}
+
+function Row({
+  label,
+  value,
+  bold,
+  accent,
+}: {
+  label: string;
+  value: string;
+  bold?: boolean;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center justify-between ${
+        accent ? "text-base text-primary font-semibold" : bold ? "font-medium" : ""
+      }`}
+    >
+      <span className="text-muted-foreground">{label}</span>
+      <span className={accent ? "" : "text-foreground"}>{value}</span>
+    </div>
+  );
+}
+
+function buildSummary(
+  typeName: string,
+  s: Selections,
+  r: ReturnType<typeof calculate>,
+): string {
+  const glass = GLASSES.find((g) => g.id === s.glassId)?.name ?? "—";
+  const profile = PROFILES.find((p) => p.id === s.profileId);
+  const model = HANDLE_MODELS.find((m) => m.id === s.modelId)?.code ?? "—";
+  const lines = [
+    `ЗАКАЗ: ${typeName}`,
+    `--------------------------------`,
+    `Высота проёма: ${s.openingHeight} мм`,
+    `Ширина проёма: ${s.openingWidth} мм`,
+    `Высота створки: ${Math.round(r.sashHeight)} мм`,
+    `Ширина створки: ${Math.round(r.sashWidth)} мм`,
+    `Площадь: ${r.totalSqm.toFixed(3)} м²`,
+    `Стекло: ${glass}`,
+    `Профиль: ${profile?.code} (${profile?.name})`,
+    `Модель ручки: ${model}`,
+    `Кол-во ручек: ${s.handleCount}`,
+    ``,
+    `Створки:`,
+    ...s.setIds.map(
+      (id, i) =>
+        `  ${i + 1}. ${SETS[id]?.name ?? id} — открывание: ${s.openings[i]}`,
+    ),
+    ``,
+    `Цена: ${formatRub(r.totalPrice)}`,
+    r.isNonStandard
+      ? `Наценка нестандарт (+30%): ${formatRub(r.nonStandardMarkup)}`
+      : "",
+    `Цена общая: ${formatRub(r.totalWithMarkup)}`,
+    `Цена РРЦ (+70%): ${formatRub(r.rrcPrice)}`,
+  ].filter(Boolean);
+  return lines.join("\n");
+}
