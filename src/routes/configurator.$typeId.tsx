@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { PartitionProjection } from "@/components/configurator/PartitionProjection";
 import { exportOrderToPdf } from "@/lib/configurator/exportPdf";
-import logoAsset from "@/assets/logo.svg.asset.json";
+import logoUrl from "@/assets/logo.svg?url";
 
 export const Route = createFileRoute("/configurator/$typeId")({
   head: ({ params }) => ({
@@ -173,7 +173,7 @@ function ConfiguratorPage() {
       <header className="border-b">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
           <img
-            src={logoAsset.url}
+            src={logoUrl}
             alt="Логотип"
             className="h-16 w-auto md:h-20"
           />
