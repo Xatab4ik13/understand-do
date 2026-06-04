@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { getPartitionType } from "@/lib/configurator/types";
+import { getPartitionType, type PartitionType } from "@/lib/configurator/types";
 import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
 import { HANDLE_MODELS } from "@/lib/configurator/models";
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/configurator/$typeId")({
 });
 
 function ConfiguratorPage() {
-  const { type } = Route.useLoaderData();
+  const { type } = Route.useLoaderData() as { type: PartitionType };
 
   const [s, setS] = useState<Selections>(() => ({
     openingHeight: 2200,
