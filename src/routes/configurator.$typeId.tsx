@@ -333,6 +333,7 @@ function ConfiguratorPage() {
                 sashHeight={result.sashHeight}
                 glassId={s.glassId}
                 profileId={s.profileId}
+                modelId={s.modelId}
                 openings={s.openings}
                 handlePositions={s.handlePositions}
               />
