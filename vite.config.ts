@@ -8,8 +8,17 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
+    // SPA mode: client-side only, no SSR. Produces a static index.html shell.
+    spa: { enabled: true },
     server: { entry: "server" },
+  },
+  // Static build for plain-static hosting (Timeweb App Platform "React").
+  // Outputs prerendered SPA to ./dist.
+  nitro: {
+    preset: "static",
+    output: {
+      dir: ".output",
+      publicDir: "dist",
+    },
   },
 });
