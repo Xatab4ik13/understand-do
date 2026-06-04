@@ -1,5 +1,5 @@
 import { GLASSES } from "./glasses";
-import { HANDLE_MODELS } from "./models";
+import { PARTITION_MODELS } from "./models";
 import { HANDLE_COUNT_PRICES, SETS } from "./sets";
 import {
   NONSTANDARD_MARKUP,
@@ -21,6 +21,8 @@ export interface Selections {
   openings: string[];
   /** общее количество ручек */
   handleCount: number;
+  /** позиции ручек (1..4) для каждой створки; пустой массив если без ручки */
+  handlePositions: number[][];
 }
 
 export interface CalculationResult {
@@ -29,12 +31,12 @@ export interface CalculationResult {
   sqmPerSash: number;
   totalSqm: number;
   glassPrice: number;
-  basePartPrice: number; // base + стекло*кв.м
-  modelsPrice: number; // модель × кол-во створок
-  setsPrice: number; // сумма стоимости выбранных систем
+  basePartPrice: number;
+  modelsPrice: number;
+  setsPrice: number;
   handlesPrice: number;
-  totalPrice: number; // до наценки
-  nonStandardMarkup: number; // сумма наценки, если нестандарт
+  totalPrice: number;
+  nonStandardMarkup: number;
   totalWithMarkup: number;
   rrcPrice: number;
   warnings: string[];
@@ -50,7 +52,7 @@ export function calculate(
   const warnings: string[] = [];
 
   const glass = GLASSES.find((g) => g.id === s.glassId);
-  const model = HANDLE_MODELS.find((m) => m.id === s.modelId);
+  const model = PARTITION_MODELS.find((m) => m.id === s.modelId);
 
   if (s.openingHeight <= 0) errors.push("Введите высоту проёма");
   if (s.openingWidth <= 0) errors.push("Введите ширину проёма");
@@ -83,22 +85,13 @@ export function calculate(
     }
   }
 
-  // Ограничение по стеклу
-  if (glass?.maxHeight && sashHeight > glass.maxHeight) {
-    errors.push(
-      `${glass.name}: высота створки не должна превышать ${glass.maxHeight} мм`,
+  // Проверка соответствия позиций и количества ручек
+  const totalPositions = s.handlePositions.reduce((sum, arr) => sum + arr.length, 0);
+  if (totalPositions > 0 && totalPositions !== s.handleCount) {
+    warnings.push(
+      `Отмечено позиций ручек: ${totalPositions}, выбрано ручек: ${s.handleCount}. Проверьте.`,
     );
   }
-
-  // Ограничения по системам
-  s.setIds.forEach((setId, idx) => {
-    const set = SETS[setId];
-    if (set?.minSashWidth && sashWidth < set.minSashWidth) {
-      errors.push(
-        `Створка ${idx + 1}: ${set.name} требует ширину полотна от ${set.minSashWidth} мм`,
-      );
-    }
-  });
 
   const glassPrice = glass?.pricePerSqm ?? 0;
   const basePartPrice = type.basePrice + glassPrice * totalSqm;
