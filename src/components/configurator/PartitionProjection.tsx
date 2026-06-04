@@ -258,14 +258,20 @@ export function PartitionProjection({
           const innerY = sy + frameT;
           const innerW = sashPxW - frameT * 2;
           const innerH = drawH - frameT * 2;
-          const hOffX = Math.min(20, innerW * 0.1);
-          const hOffY = Math.min(34, innerH * 0.16);
+          // Отступы ручки от рамы (внутри стекла).
+          // По вертикали — отступ побольше, чтобы ручка читалась как
+          // фурнитура, а не как уголок профиля. По горизонтали — ближе к
+          // кромке створки (там, где ручка реально стоит).
+          const hOffX = Math.max(14, Math.min(26, innerW * 0.09));
+          const hOffY = Math.max(40, Math.min(70, innerH * 0.22));
           const handleCoord = (pos: number) => {
+            // 2 = верх-лево, 3 = верх-право, 1 = низ-лево, 4 = низ-право
             const left = pos === 1 || pos === 2;
             const top = pos === 2 || pos === 3;
             return {
               x: left ? innerX + hOffX : innerX + innerW - hOffX,
               y: top ? innerY + hOffY : innerY + innerH - hOffY,
+              left,
             };
           };
 
