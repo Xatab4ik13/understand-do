@@ -1,9 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getPartitionType, type PartitionType } from "@/lib/configurator/types";
 import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
-import { HANDLE_MODELS } from "@/lib/configurator/models";
+import { PARTITION_MODELS } from "@/lib/configurator/models";
 import { HANDLE_COUNT_PRICES, SETS } from "@/lib/configurator/sets";
 import { calculate, formatRub, type Selections } from "@/lib/configurator/calculate";
 import { Button } from "@/components/ui/button";
@@ -36,21 +36,70 @@ export const Route = createFileRoute("/configurator/$typeId")({
   },
 });
 
+/** Вычислить макс. допустимую высоту проёма с учётом ограничения стекла */
+function maxOpeningHeight(type: PartitionType, glassId: string): number | undefined {
+  const glass = GLASSES.find((g) => g.id === glassId);
+  if (!glass?.maxHeight) return undefined;
+  // sashHeight = openingHeight + offset → openingHeight = maxHeight − offset
+  return glass.maxHeight - type.sashHeightOffset;
+}
+
+/** Допустимые системы с учётом текущей ширины створки */
+function allowedSetsFor(
+  allowed: string[],
+  sashWidth: number,
+): string[] {
+  return allowed.filter((id) => {
+    const set = SETS[id];
+    if (!set) return false;
+    if (set.minSashWidth && sashWidth > 0 && sashWidth < set.minSashWidth) return false;
+    return true;
+  });
+}
+
 function ConfiguratorPage() {
   const { type } = Route.useLoaderData() as { type: PartitionType };
 
   const [s, setS] = useState<Selections>(() => ({
     openingHeight: 2200,
     openingWidth: 1500,
-    glassId: GLASSES[4].id, // Стекло 4мм
+    glassId: GLASSES[4].id,
     profileId: PROFILES[0].id,
-    modelId: HANDLE_MODELS[0].id,
+    modelId: PARTITION_MODELS[0].id,
     setIds: type.sashes.map((sash) => sash.allowedSets[0]),
     openings: type.sashes.map((sash) => sash.allowedOpenings[0]),
     handleCount: Math.min(type.sashCount, type.maxHandleCount) || 1,
+    handlePositions: type.sashes.map(() => []),
   }));
 
   const result = useMemo(() => calculate(type, s), [type, s]);
+  const sashWidth = result.sashWidth;
+
+  // Авто-clamp высоты проёма при смене стекла
+  useEffect(() => {
+    const maxH = maxOpeningHeight(type, s.glassId);
+    if (maxH && s.openingHeight > maxH) {
+      setS((prev) => ({ ...prev, openingHeight: Math.floor(maxH) }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [s.glassId]);
+
+  // Авто-переключение системы, если текущая стала недопустимой
+  useEffect(() => {
+    setS((prev) => {
+      let changed = false;
+      const newSetIds = prev.setIds.map((id, idx) => {
+        const allowed = allowedSetsFor(type.sashes[idx].allowedSets, sashWidth);
+        if (allowed.length === 0) return id;
+        if (!allowed.includes(id)) {
+          changed = true;
+          return allowed[0];
+        }
+        return id;
+      });
+      return changed ? { ...prev, setIds: newSetIds } : prev;
+    });
+  }, [sashWidth, type]);
 
   const updateSet = (idx: number, value: string) => {
     setS((prev) => ({
@@ -64,11 +113,27 @@ function ConfiguratorPage() {
       openings: prev.openings.map((v, i) => (i === idx ? value : v)),
     }));
   };
+  const togglePosition = (sashIdx: number, pos: number) => {
+    setS((prev) => {
+      const current = prev.handlePositions[sashIdx] ?? [];
+      const next = current.includes(pos)
+        ? current.filter((p) => p !== pos)
+        : [...current, pos].sort();
+      return {
+        ...prev,
+        handlePositions: prev.handlePositions.map((arr, i) =>
+          i === sashIdx ? next : arr,
+        ),
+      };
+    });
+  };
 
   const handleCountOptions = Array.from(
     { length: type.maxHandleCount },
     (_, i) => i + 1,
   );
+
+  const maxH = maxOpeningHeight(type, s.glassId);
 
   const summary = buildSummary(type.name, s, result);
 
@@ -107,21 +172,25 @@ function ConfiguratorPage() {
       </header>
 
       <main className="mx-auto grid max-w-6xl gap-6 px-6 py-6 lg:grid-cols-[1fr_360px]">
-        {/* Форма */}
         <div className="space-y-6">
-          {/* Размеры проёма */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Перегородка</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
-              <Field label="Высота проёма (мм)">
+              <Field
+                label="Высота проёма (мм)"
+                hint={maxH ? `Макс. для выбранного стекла: ${maxH} мм` : undefined}
+              >
                 <Input
                   type="number"
+                  max={maxH}
                   value={s.openingHeight || ""}
-                  onChange={(e) =>
-                    setS({ ...s, openingHeight: Number(e.target.value) || 0 })
-                  }
+                  onChange={(e) => {
+                    const v = Number(e.target.value) || 0;
+                    const clamped = maxH ? Math.min(v, maxH) : v;
+                    setS({ ...s, openingHeight: clamped });
+                  }}
                 />
               </Field>
               <Field label="Ширина проёма (мм)">
@@ -184,13 +253,12 @@ function ConfiguratorPage() {
             </CardContent>
           </Card>
 
-          {/* Комплектация */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Комплектация</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
-              <Field label="Модель ручки">
+              <Field label="Модель перегородки">
                 <Select
                   value={s.modelId}
                   onValueChange={(v) => setS({ ...s, modelId: v })}
@@ -199,7 +267,7 @@ function ConfiguratorPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {HANDLE_MODELS.map((m) => (
+                    {PARTITION_MODELS.map((m) => (
                       <SelectItem key={m.id} value={m.id}>
                         {m.code} {m.price > 0 ? `(+${formatRub(m.price)})` : "(базовая)"}
                       </SelectItem>
@@ -229,69 +297,84 @@ function ConfiguratorPage() {
             </CardContent>
           </Card>
 
-          {/* Створки */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Створки</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {type.sashes.map((sash, idx) => (
-                <div
-                  key={idx}
-                  className="grid gap-3 rounded-md border p-3 sm:grid-cols-2"
-                >
-                  <div className="sm:col-span-2 text-sm font-medium">
-                    Створка {idx + 1}{" "}
-                    {!sash.hasHandle && (
-                      <span className="text-muted-foreground">(без ручки)</span>
+              {type.sashes.map((sash, idx) => {
+                const allowedSets = allowedSetsFor(sash.allowedSets, sashWidth);
+                const displaySets =
+                  allowedSets.length > 0 ? allowedSets : sash.allowedSets;
+                return (
+                  <div
+                    key={idx}
+                    className="grid gap-3 rounded-md border p-3 sm:grid-cols-2"
+                  >
+                    <div className="sm:col-span-2 text-sm font-medium">
+                      Створка {idx + 1}{" "}
+                      {!sash.hasHandle && (
+                        <span className="text-muted-foreground">(без ручки)</span>
+                      )}
+                    </div>
+                    <Field label="Система">
+                      <Select
+                        value={s.setIds[idx]}
+                        onValueChange={(v) => updateSet(idx, v)}
+                        disabled={displaySets.length === 1}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {displaySets.map((setId) => {
+                            const set = SETS[setId];
+                            return (
+                              <SelectItem key={setId} value={setId}>
+                                {set.name} — {formatRub(set.price)}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label="Открывание">
+                      <Select
+                        value={s.openings[idx]}
+                        onValueChange={(v) => updateOpening(idx, v)}
+                        disabled={sash.allowedOpenings.length === 1}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sash.allowedOpenings.map((o) => (
+                            <SelectItem key={o} value={o}>
+                              {o}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+
+                    {sash.hasHandle && (
+                      <div className="sm:col-span-2">
+                        <Label className="text-xs text-muted-foreground">
+                          Расположение ручек
+                        </Label>
+                        <HandlePositionPicker
+                          selected={s.handlePositions[idx] ?? []}
+                          onToggle={(p) => togglePosition(idx, p)}
+                        />
+                      </div>
                     )}
                   </div>
-                  <Field label="Система">
-                    <Select
-                      value={s.setIds[idx]}
-                      onValueChange={(v) => updateSet(idx, v)}
-                      disabled={sash.allowedSets.length === 1}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sash.allowedSets.map((setId) => {
-                          const set = SETS[setId];
-                          return (
-                            <SelectItem key={setId} value={setId}>
-                              {set.name} — {formatRub(set.price)}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Открывание">
-                    <Select
-                      value={s.openings[idx]}
-                      onValueChange={(v) => updateOpening(idx, v)}
-                      disabled={sash.allowedOpenings.length === 1}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sash.allowedOpenings.map((o) => (
-                          <SelectItem key={o} value={o}>
-                            {o}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                </div>
-              ))}
+                );
+              })}
             </CardContent>
           </Card>
         </div>
 
-        {/* Итог */}
         <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
           <Card>
             <CardHeader>
@@ -372,11 +455,20 @@ function ConfiguratorPage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
       <Label className="text-xs text-muted-foreground">{label}</Label>
       {children}
+      {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
     </div>
   );
 }
@@ -413,6 +505,46 @@ function Row({
   );
 }
 
+/** Сетка позиций ручек:  2  3
+ *                         1  4
+ */
+function HandlePositionPicker({
+  selected,
+  onToggle,
+}: {
+  selected: number[];
+  onToggle: (pos: number) => void;
+}) {
+  // Сетка 2 рядов × 2 колонок. Верх: 2,3. Низ: 1,4.
+  const grid = [
+    [2, 3],
+    [1, 4],
+  ];
+  return (
+    <div className="mt-1 inline-grid grid-cols-2 gap-1.5 rounded-md border p-2">
+      {grid.flat().map((pos) => {
+        const isSelected = selected.includes(pos);
+        return (
+          <button
+            type="button"
+            key={pos}
+            onClick={() => onToggle(pos)}
+            className={`h-9 w-9 rounded text-sm font-medium transition-colors ${
+              isSelected
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/70"
+            }`}
+            aria-pressed={isSelected}
+            title={`Позиция ${pos}`}
+          >
+            {pos}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function buildSummary(
   typeName: string,
   s: Selections,
@@ -420,7 +552,7 @@ function buildSummary(
 ): string {
   const glass = GLASSES.find((g) => g.id === s.glassId)?.name ?? "—";
   const profile = PROFILES.find((p) => p.id === s.profileId);
-  const model = HANDLE_MODELS.find((m) => m.id === s.modelId)?.code ?? "—";
+  const model = PARTITION_MODELS.find((m) => m.id === s.modelId)?.code ?? "—";
   const lines = [
     `ЗАКАЗ: ${typeName}`,
     `--------------------------------`,
@@ -431,14 +563,16 @@ function buildSummary(
     `Площадь: ${r.totalSqm.toFixed(3)} м²`,
     `Стекло: ${glass}`,
     `Профиль: ${profile?.code} (${profile?.name})`,
-    `Модель ручки: ${model}`,
+    `Модель перегородки: ${model}`,
     `Кол-во ручек: ${s.handleCount}`,
     ``,
     `Створки:`,
-    ...s.setIds.map(
-      (id, i) =>
-        `  ${i + 1}. ${SETS[id]?.name ?? id} — открывание: ${s.openings[i]}`,
-    ),
+    ...s.setIds.map((id, i) => {
+      const positions = s.handlePositions[i] ?? [];
+      const posStr =
+        positions.length > 0 ? ` — ручки в позициях: ${positions.join(", ")}` : "";
+      return `  ${i + 1}. ${SETS[id]?.name ?? id} — открывание: ${s.openings[i]}${posStr}`;
+    }),
     ``,
     `Цена: ${formatRub(r.totalPrice)}`,
     r.isNonStandard
