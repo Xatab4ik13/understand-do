@@ -151,11 +151,13 @@ export function PartitionProjection({
 
   const tint = glassTint(glassId);
   const prof = profileLook(profileId);
-  const photoUrl = MODEL_IMAGES[modelId];
+  const mullions = MODEL_MULLIONS[modelId] ?? [];
   const sashCount = type.sashCount;
   const sashPxW = drawW / sashCount;
   // Толщина рамы профиля — пропорциональна, но не меньше 6 / не больше 12
   const frameT = Math.max(6, Math.min(12, drawW * 0.014));
+  // Толщина импоста — чуть тоньше рамы
+  const mullT = Math.max(4, frameT * 0.7);
 
   const uid = `proj-${modelId}-${profileId}-${glassId}`;
 
