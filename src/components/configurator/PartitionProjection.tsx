@@ -229,40 +229,31 @@ export function PartitionProjection({
             <stop offset="0%" stopColor="white" stopOpacity="0.18" />
             <stop offset="35%" stopColor="white" stopOpacity="0" />
           </linearGradient>
-          {/* Свет сверху (мягкая засветка фотофона) */}
-          <linearGradient id={`${uid}-topLight`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="white" stopOpacity="0.18" />
-            <stop offset="50%" stopColor="white" stopOpacity="0" />
+          {/* Мягкий «фон комнаты» за стеклом — лёгкий вертикальный градиент */}
+          <linearGradient id={`${uid}-roomBg`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f3f5f7" />
+            <stop offset="55%" stopColor="#e6eaee" />
+            <stop offset="100%" stopColor="#d4d9de" />
           </linearGradient>
           {/* Тень от перегородки */}
           <radialGradient id={`${uid}-shadow`} cx="0.5" cy="0" r="0.6">
             <stop offset="0%" stopColor="black" stopOpacity="0.45" />
             <stop offset="100%" stopColor="black" stopOpacity="0" />
           </radialGradient>
-          {/* Скруглённый клип фотофона */}
+          {/* Скруглённый клип */}
           <clipPath id={`${uid}-clip`}>
             <rect x={x0} y={y0} width={drawW} height={drawH} rx={3} ry={3} />
           </clipPath>
         </defs>
 
-        {/* ===== Фон-сцена: фото модели + мягкий верхний свет ===== */}
+        {/* ===== Фон-сцена: нейтральный фон комнаты ===== */}
         <g clipPath={`url(#${uid}-clip)`}>
-          {photoUrl && (
-            <image
-              href={photoUrl}
-              x={x0}
-              y={y0}
-              width={drawW}
-              height={drawH}
-              preserveAspectRatio="xMidYMid slice"
-            />
-          )}
           <rect
             x={x0}
             y={y0}
             width={drawW}
             height={drawH}
-            fill={`url(#${uid}-topLight)`}
+            fill={`url(#${uid}-roomBg)`}
           />
         </g>
 
