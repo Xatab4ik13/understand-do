@@ -58,7 +58,8 @@ function allowedSetsFor(
 }
 
 function ConfiguratorPage() {
-  const { type } = Route.useLoaderData() as { type: PartitionType };
+  const { typeId } = Route.useLoaderData() as { typeId: string };
+  const type = getPartitionType(typeId)!;
 
   const [s, setS] = useState<Selections>(() => ({
     openingHeight: 2200,
