@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, AlertTriangle, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { PartitionProjection } from "@/components/configurator/PartitionProjection";
 
 export const Route = createFileRoute("/configurator/$typeId")({
   head: ({ params }) => ({
