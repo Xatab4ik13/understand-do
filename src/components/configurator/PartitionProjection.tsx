@@ -38,35 +38,53 @@ interface Props {
   handlePositions: number[][];
 }
 
-/** Тонировка стекла поверх фоновой фотографии (через прозрачность) */
-function glassTint(glassId: string): { color: string; opacity: number } {
+/** Минимальная тонировка стекла (поверх фоновой фотографии) */
+function glassTint(glassId: string): {
+  color: string;
+  opacity: number;
+  /** базовая прозрачность даже у "прозрачного" стекла, чтобы был визуальный отклик */
+  min?: number;
+} {
   const g = GLASSES.find((x) => x.id === glassId);
   const n = (g?.name ?? "").toLowerCase();
-  if (n.includes("зеркало")) return { color: "#cdd6dc", opacity: 0.78 };
-  if (n.includes("мору")) return { color: "#e8edec", opacity: 0.55 };
-  if (n.includes("кафедрал")) return { color: "#e1e7ea", opacity: 0.45 };
-  if (n.includes("вижн")) return { color: "#d8e2e6", opacity: 0.4 };
-  if (n.includes("сатинат")) return { color: "#f0f3f4", opacity: 0.6 };
-  if (n.includes("дихроник")) return { color: "#b9d7e8", opacity: 0.3 };
+  if (n.includes("зеркало")) return { color: "#cdd6dc", opacity: 0.82 };
+  if (n.includes("мору")) return { color: "#e8edec", opacity: 0.62 };
+  if (n.includes("кафедрал")) return { color: "#e1e7ea", opacity: 0.5 };
+  if (n.includes("вижн")) return { color: "#d8e2e6", opacity: 0.45 };
+  if (n.includes("сатинат")) return { color: "#f0f3f4", opacity: 0.68 };
+  if (n.includes("дихроник")) return { color: "#b9d7e8", opacity: 0.32 };
   if (n.includes("черное") || n.includes("чёрное"))
-    return { color: "#0e1112", opacity: 0.78 };
-  if (n.includes("графит")) return { color: "#2c3035", opacity: 0.5 };
-  if (n.includes("бронза")) return { color: "#8a5a25", opacity: 0.35 };
+    return { color: "#0e1112", opacity: 0.8 };
+  if (n.includes("графит")) return { color: "#2c3035", opacity: 0.55 };
+  if (n.includes("бронза")) return { color: "#8a5a25", opacity: 0.4 };
   if (n.includes("осветленное") || n.includes("осветлённое"))
-    return { color: "#dbe8ed", opacity: 0.18 };
-  return { color: "#bcd5dd", opacity: 0.22 };
+    return { color: "#dbe8ed", opacity: 0.22 };
+  return { color: "#bcd5dd", opacity: 0.18 };
 }
 
-function profileColor(profileId: string): string {
+interface ProfileLook {
+  base: string;
+  light: string;
+  dark: string;
+  /** для светлых профилей лучше тёмная подпись */
+  isDark: boolean;
+}
+
+function profileLook(profileId: string): ProfileLook {
   const p = PROFILES.find((x) => x.id === profileId);
   const n = `${p?.code ?? ""} ${p?.name ?? ""}`.toLowerCase();
   if (n.includes("чёрн") || n.includes("черн") || n.includes("graf") || n.includes("граф"))
-    return "#1a1a1a";
-  if (n.includes("бронз")) return "#6a4a25";
-  if (n.includes("золот")) return "#b08a3e";
-  if (n.includes("шамп")) return "#a89377";
-  if (n.includes("бел")) return "#e8e8e8";
-  return "#5b6168";
+    return { base: "#1a1a1a", light: "#3a3a3a", dark: "#000000", isDark: true };
+  if (n.includes("бронз"))
+    return { base: "#5e3f1f", light: "#8a6638", dark: "#2e1d0c", isDark: true };
+  if (n.includes("золот"))
+    return { base: "#a8842e", light: "#d4ad55", dark: "#6e5414", isDark: true };
+  if (n.includes("шамп"))
+    return { base: "#9a8569", light: "#c4b39c", dark: "#5e4c37", isDark: true };
+  if (n.includes("бел"))
+    return { base: "#eaeaea", light: "#ffffff", dark: "#b8b8b8", isDark: false };
+  // matt серебристый/алюм
+  return { base: "#6b7178", light: "#9aa1a8", dark: "#3e4348", isDark: true };
 }
 
 export function PartitionProjection({
@@ -81,29 +99,75 @@ export function PartitionProjection({
   openings,
   handlePositions,
 }: Props) {
-  const PAD = 56;
-  const MAX_W = 720;
-  const MAX_H = 360;
+  // ---- Каркас ----
+  const PAD_L = 64;
+  const PAD_R = 28;
+  const PAD_T = 28;
+  const PAD_B = 76;
+
+  const MAX_W = 760;
+  const MAX_H = 440;
   const ratio = openingWidth > 0 && openingHeight > 0 ? openingWidth / openingHeight : 1.5;
-  let drawW = MAX_W - PAD * 2;
+  let drawW = MAX_W - PAD_L - PAD_R;
   let drawH = drawW / ratio;
-  if (drawH > MAX_H - PAD * 2) {
-    drawH = MAX_H - PAD * 2;
+  if (drawH > MAX_H - PAD_T - PAD_B) {
+    drawH = MAX_H - PAD_T - PAD_B;
     drawW = drawH * ratio;
   }
-  const W = drawW + PAD * 2;
-  const H = drawH + PAD * 2;
-  const x0 = PAD;
-  const y0 = PAD;
+  const W = drawW + PAD_L + PAD_R;
+  const H = drawH + PAD_T + PAD_B;
+  const x0 = PAD_L;
+  const y0 = PAD_T;
 
   const tint = glassTint(glassId);
-  const profile = profileColor(profileId);
+  const prof = profileLook(profileId);
   const photoUrl = MODEL_IMAGES[modelId];
   const sashCount = type.sashCount;
   const sashPxW = drawW / sashCount;
-  const frameT = Math.max(4, Math.min(10, drawW * 0.012));
+  // Толщина рамы профиля — пропорциональна, но не меньше 6 / не больше 12
+  const frameT = Math.max(6, Math.min(12, drawW * 0.014));
 
-  const clipId = `proj-clip-${modelId}`;
+  const uid = `proj-${modelId}-${profileId}-${glassId}`;
+
+  // Helper: профиль как многослойная "металлическая" рамка
+  const drawProfileFrame = (sx: number, sy: number, w: number, h: number, key: string) => {
+    const t = frameT;
+    // 1) тёмная подложка (внешняя кромка)
+    // 2) основной цвет
+    // 3) светлая внутренняя кромка (фаска)
+    return (
+      <g key={key}>
+        <rect
+          x={sx + 0.5}
+          y={sy + 0.5}
+          width={w - 1}
+          height={h - 1}
+          fill="none"
+          stroke={prof.dark}
+          strokeWidth={t + 1}
+        />
+        <rect
+          x={sx + 0.5}
+          y={sy + 0.5}
+          width={w - 1}
+          height={h - 1}
+          fill="none"
+          stroke={`url(#${uid}-profGrad)`}
+          strokeWidth={t}
+        />
+        <rect
+          x={sx + t - 0.5}
+          y={sy + t - 0.5}
+          width={w - (t - 0.5) * 2}
+          height={h - (t - 0.5) * 2}
+          fill="none"
+          stroke={prof.light}
+          strokeOpacity={0.55}
+          strokeWidth={1}
+        />
+      </g>
+    );
+  };
 
   return (
     <div className="w-full overflow-x-auto">
@@ -115,30 +179,42 @@ export function PartitionProjection({
         aria-label="Проекция перегородки"
       >
         <defs>
-          {/* Блик на стекле */}
-          <linearGradient id="glassSheen" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="white" stopOpacity="0.22" />
+          {/* Градиент металла на профиле (вертикальный — сверху светлее) */}
+          <linearGradient id={`${uid}-profGrad`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={prof.light} />
+            <stop offset="45%" stopColor={prof.base} />
+            <stop offset="100%" stopColor={prof.dark} />
+          </linearGradient>
+          {/* Лёгкий вертикальный sheen стекла */}
+          <linearGradient id={`${uid}-glassSheen`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="white" stopOpacity="0.28" />
+            <stop offset="40%" stopColor="white" stopOpacity="0" />
+            <stop offset="85%" stopColor="black" stopOpacity="0" />
+            <stop offset="100%" stopColor="black" stopOpacity="0.12" />
+          </linearGradient>
+          {/* Диагональный блик */}
+          <linearGradient id={`${uid}-diagSheen`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="white" stopOpacity="0.18" />
+            <stop offset="35%" stopColor="white" stopOpacity="0" />
+          </linearGradient>
+          {/* Свет сверху (мягкая засветка фотофона) */}
+          <linearGradient id={`${uid}-topLight`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="white" stopOpacity="0.18" />
             <stop offset="50%" stopColor="white" stopOpacity="0" />
-            <stop offset="100%" stopColor="white" stopOpacity="0.1" />
           </linearGradient>
-          {/* Виньетка по краям фото — мягко уводит фон */}
-          <radialGradient id="vignette" cx="0.5" cy="0.5" r="0.7">
-            <stop offset="60%" stopColor="black" stopOpacity="0" />
-            <stop offset="100%" stopColor="black" stopOpacity="0.35" />
-          </radialGradient>
-          {/* Тень от перегородки на полу */}
-          <linearGradient id="floorShadow" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="black" stopOpacity="0.22" />
+          {/* Тень от перегородки */}
+          <radialGradient id={`${uid}-shadow`} cx="0.5" cy="0" r="0.6">
+            <stop offset="0%" stopColor="black" stopOpacity="0.45" />
             <stop offset="100%" stopColor="black" stopOpacity="0" />
-          </linearGradient>
-          {/* Скруглённый клип для всей сцены — мягкие углы */}
-          <clipPath id={clipId}>
-            <rect x={x0} y={y0} width={drawW} height={drawH} rx={4} ry={4} />
+          </radialGradient>
+          {/* Скруглённый клип фотофона */}
+          <clipPath id={`${uid}-clip`}>
+            <rect x={x0} y={y0} width={drawW} height={drawH} rx={3} ry={3} />
           </clipPath>
         </defs>
 
-        {/* ===== Фон-сцена: фото выбранной модели ===== */}
-        <g clipPath={`url(#${clipId})`}>
+        {/* ===== Фон-сцена: фото модели + мягкий верхний свет ===== */}
+        <g clipPath={`url(#${uid}-clip)`}>
           {photoUrl && (
             <image
               href={photoUrl}
@@ -149,29 +225,25 @@ export function PartitionProjection({
               preserveAspectRatio="xMidYMid slice"
             />
           )}
-          {/* Виньетка поверх фото */}
-          <rect x={x0} y={y0} width={drawW} height={drawH} fill="url(#vignette)" />
+          <rect
+            x={x0}
+            y={y0}
+            width={drawW}
+            height={drawH}
+            fill={`url(#${uid}-topLight)`}
+          />
         </g>
 
-        {/* Тонкая рамка проёма */}
-        <rect
-          x={x0}
-          y={y0}
-          width={drawW}
-          height={drawH}
-          fill="none"
-          stroke="hsl(var(--border))"
-          strokeWidth={1}
-          rx={4}
-        />
-
-        {/* Тень-пол */}
-        <ellipse
-          cx={x0 + drawW / 2}
-          cy={y0 + drawH + 14}
-          rx={drawW * 0.5}
-          ry={7}
-          fill="url(#floorShadow)"
+        {/* ===== Верхняя направляющая (рельс) — тонкая линия над рамой ===== */}
+        <line
+          x1={x0 - 4}
+          y1={y0 - 6}
+          x2={x0 + drawW + 4}
+          y2={y0 - 6}
+          stroke={prof.base}
+          strokeOpacity={0.4}
+          strokeWidth={1.5}
+          strokeLinecap="round"
         />
 
         {/* ===== Створки ===== */}
@@ -186,8 +258,8 @@ export function PartitionProjection({
           const innerY = sy + frameT;
           const innerW = sashPxW - frameT * 2;
           const innerH = drawH - frameT * 2;
-          const hOffX = Math.min(18, innerW * 0.12);
-          const hOffY = Math.min(28, innerH * 0.18);
+          const hOffX = Math.min(20, innerW * 0.1);
+          const hOffY = Math.min(34, innerH * 0.16);
           const handleCoord = (pos: number) => {
             const left = pos === 1 || pos === 2;
             const top = pos === 2 || pos === 3;
@@ -199,7 +271,7 @@ export function PartitionProjection({
 
           return (
             <g key={i}>
-              {/* Тонировка стекла (полупрозрачная — фон просвечивает) */}
+              {/* Тонировка стекла */}
               <rect
                 x={innerX}
                 y={innerY}
@@ -208,74 +280,91 @@ export function PartitionProjection({
                 fill={tint.color}
                 opacity={tint.opacity}
               />
-              {/* Блик */}
+              {/* Вертикальный sheen */}
               <rect
                 x={innerX}
                 y={innerY}
                 width={innerW}
                 height={innerH}
-                fill="url(#glassSheen)"
+                fill={`url(#${uid}-glassSheen)`}
+                pointerEvents="none"
+              />
+              {/* Диагональный блик */}
+              <rect
+                x={innerX}
+                y={innerY}
+                width={innerW}
+                height={innerH}
+                fill={`url(#${uid}-diagSheen)`}
                 pointerEvents="none"
               />
 
-              {/* Профиль (рамка створки) */}
-              <rect
-                x={sx + frameT / 2}
-                y={sy + frameT / 2}
-                width={sashPxW - frameT}
-                height={drawH - frameT}
-                fill="none"
-                stroke={profile}
-                strokeWidth={frameT}
-              />
+              {/* Профильная рамка */}
+              {drawProfileFrame(sx, sy, sashPxW, drawH, `frame-${i}`)}
 
               {/* Индикатор открывания / стационара */}
               {opening === "Стационар" ? (
-                <g opacity={0.55}>
+                <g opacity={0.45}>
                   <line
-                    x1={innerX + 8}
-                    y1={innerY + 8}
-                    x2={innerX + innerW - 8}
-                    y2={innerY + innerH - 8}
-                    stroke={profile}
+                    x1={innerX + 10}
+                    y1={innerY + 10}
+                    x2={innerX + innerW - 10}
+                    y2={innerY + innerH - 10}
+                    stroke={prof.dark}
                     strokeWidth={1}
-                    strokeDasharray="4 4"
+                    strokeDasharray="5 5"
                   />
                   <line
-                    x1={innerX + innerW - 8}
-                    y1={innerY + 8}
-                    x2={innerX + 8}
-                    y2={innerY + innerH - 8}
-                    stroke={profile}
+                    x1={innerX + innerW - 10}
+                    y1={innerY + 10}
+                    x2={innerX + 10}
+                    y2={innerY + innerH - 10}
+                    stroke={prof.dark}
                     strokeWidth={1}
-                    strokeDasharray="4 4"
+                    strokeDasharray="5 5"
                   />
                 </g>
               ) : (
-                <g opacity={0.85}>
+                <g>
                   {(() => {
-                    const cy = sy + drawH - 18;
+                    const cy = sy + drawH - 22;
                     const cx = sx + sashPxW / 2;
-                    const len = Math.min(sashPxW * 0.45, 60);
+                    const len = Math.min(sashPxW * 0.6, 80);
                     const isLeft = opening === "Левое";
-                    const x1 = isLeft ? cx + len / 2 : cx - len / 2;
-                    const x2 = isLeft ? cx - len / 2 : cx + len / 2;
-                    const head = 5;
+                    const xL = cx - len / 2;
+                    const xR = cx + len / 2;
+                    const xArrowEnd = isLeft ? xL : xR;
+                    const head = 6;
                     return (
                       <>
+                        {/* Трек направляющей (пунктир) */}
                         <line
-                          x1={x1}
+                          x1={xL}
                           y1={cy}
-                          x2={x2}
+                          x2={xR}
                           y2={cy}
                           stroke="hsl(var(--primary))"
-                          strokeWidth={1.5}
+                          strokeOpacity={0.35}
+                          strokeWidth={1}
+                          strokeDasharray="3 3"
+                        />
+                        {/* Стрелка */}
+                        <line
+                          x1={isLeft ? xR : xL}
+                          y1={cy}
+                          x2={xArrowEnd}
+                          y2={cy}
+                          stroke="hsl(var(--primary))"
+                          strokeWidth={1.6}
+                          strokeLinecap="round"
                         />
                         <polyline
-                          points={`${x2 + (isLeft ? head : -head)},${cy - head} ${x2},${cy} ${x2 + (isLeft ? head : -head)},${cy + head}`}
+                          points={`${xArrowEnd + (isLeft ? head : -head)},${cy - head} ${xArrowEnd},${cy} ${xArrowEnd + (isLeft ? head : -head)},${cy + head}`}
                           fill="none"
                           stroke="hsl(var(--primary))"
-                          strokeWidth={1.5}
+                          strokeWidth={1.6}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         />
                       </>
                     );
@@ -289,22 +378,44 @@ export function PartitionProjection({
                   const { x, y } = handleCoord(pos);
                   return (
                     <g key={pos}>
+                      {/* Скоба */}
                       <rect
-                        x={x - 3}
-                        y={y - 14}
-                        width={6}
-                        height={28}
-                        rx={2}
-                        fill={profile}
-                        opacity={0.95}
+                        x={x - 2.5}
+                        y={y - 18}
+                        width={5}
+                        height={36}
+                        rx={2.5}
+                        fill={`url(#${uid}-profGrad)`}
+                        stroke={prof.dark}
+                        strokeWidth={0.6}
                       />
+                      {/* Блик на скобе */}
+                      <line
+                        x1={x - 1}
+                        y1={y - 16}
+                        x2={x - 1}
+                        y2={y + 16}
+                        stroke={prof.light}
+                        strokeOpacity={0.7}
+                        strokeWidth={0.6}
+                      />
+                      {/* Верхнее крепление */}
                       <circle
                         cx={x}
-                        cy={y}
-                        r={3}
-                        fill="hsl(var(--background))"
-                        stroke={profile}
-                        strokeWidth={1.5}
+                        cy={y - 14}
+                        r={2.5}
+                        fill={prof.base}
+                        stroke={prof.dark}
+                        strokeWidth={0.6}
+                      />
+                      {/* Нижнее крепление */}
+                      <circle
+                        cx={x}
+                        cy={y + 14}
+                        r={2.5}
+                        fill={prof.base}
+                        stroke={prof.dark}
+                        strokeWidth={0.6}
                       />
                     </g>
                   );
@@ -313,69 +424,143 @@ export function PartitionProjection({
           );
         })}
 
-        {/* ===== Размерные линии ===== */}
-        {/* Ширина (низ) */}
-        <g fontFamily="ui-sans-serif, system-ui" fontSize="11" fill="hsl(var(--muted-foreground))">
-          <line
-            x1={x0}
-            y1={y0 + drawH + 30}
-            x2={x0 + drawW}
-            y2={y0 + drawH + 30}
-            stroke="currentColor"
-            strokeWidth={0.8}
-          />
-          <line x1={x0} y1={y0 + drawH + 26} x2={x0} y2={y0 + drawH + 34} stroke="currentColor" />
-          <line
-            x1={x0 + drawW}
-            y1={y0 + drawH + 26}
-            x2={x0 + drawW}
-            y2={y0 + drawH + 34}
-            stroke="currentColor"
-          />
-          <text x={x0 + drawW / 2} y={y0 + drawH + 46} textAnchor="middle">
-            {openingWidth} мм
-          </text>
-        </g>
+        {/* ===== Тень под перегородкой (узкая, реалистичная) ===== */}
+        <rect
+          x={x0 - 8}
+          y={y0 + drawH + 1}
+          width={drawW + 16}
+          height={18}
+          fill={`url(#${uid}-shadow)`}
+          opacity={0.7}
+        />
 
-        {/* Высота (слева) */}
-        <g fontFamily="ui-sans-serif, system-ui" fontSize="11" fill="hsl(var(--muted-foreground))">
-          <line
-            x1={x0 - 22}
-            y1={y0}
-            x2={x0 - 22}
-            y2={y0 + drawH}
-            stroke="currentColor"
-            strokeWidth={0.8}
-          />
-          <line x1={x0 - 26} y1={y0} x2={x0 - 18} y2={y0} stroke="currentColor" />
-          <line
-            x1={x0 - 26}
-            y1={y0 + drawH}
-            x2={x0 - 18}
-            y2={y0 + drawH}
-            stroke="currentColor"
-          />
-          <text
-            x={x0 - 30}
-            y={y0 + drawH / 2}
-            textAnchor="middle"
-            transform={`rotate(-90 ${x0 - 30} ${y0 + drawH / 2})`}
-          >
-            {openingHeight} мм
-          </text>
-        </g>
+        {/* ===== Линия пола ===== */}
+        <line
+          x1={x0 - 20}
+          y1={y0 + drawH + 1}
+          x2={x0 + drawW + 20}
+          y2={y0 + drawH + 1}
+          stroke="hsl(var(--foreground))"
+          strokeOpacity={0.25}
+          strokeWidth={0.8}
+        />
 
-        {/* Подпись створки (верх) */}
-        <text
-          x={x0 + drawW / 2}
-          y={y0 - 16}
-          textAnchor="middle"
-          fontSize="11"
-          fill="hsl(var(--muted-foreground))"
-          fontFamily="ui-sans-serif, system-ui"
-        >
-          створка {Math.round(sashWidth)} × {Math.round(sashHeight)} мм
-        </text>
+        {/* ===== РАЗМЕРНЫЕ ЛИНИИ ===== */}
+        {(() => {
+          const dimStroke = "hsl(var(--muted-foreground))";
+          const dimFill = "hsl(var(--muted-foreground))";
+          const tickW = 0.8;
+          const lineW = 0.5;
+          return (
+            <g fontFamily="ui-sans-serif, system-ui" fontSize="11">
+              {/* Высота (слева) */}
+              {/* Выносные линии от рамы */}
+              <line
+                x1={x0 - 4}
+                y1={y0}
+                x2={x0 - 38}
+                y2={y0}
+                stroke={dimStroke}
+                strokeWidth={lineW}
+              />
+              <line
+                x1={x0 - 4}
+                y1={y0 + drawH}
+                x2={x0 - 38}
+                y2={y0 + drawH}
+                stroke={dimStroke}
+                strokeWidth={lineW}
+              />
+              {/* Размерная линия */}
+              <line
+                x1={x0 - 30}
+                y1={y0}
+                x2={x0 - 30}
+                y2={y0 + drawH}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              {/* Засечки */}
+              <line
+                x1={x0 - 34}
+                y1={y0 - 4}
+                x2={x0 - 26}
+                y2={y0 + 4}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              <line
+                x1={x0 - 34}
+                y1={y0 + drawH - 4}
+                x2={x0 - 26}
+                y2={y0 + drawH + 4}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              <text
+                x={x0 - 42}
+                y={y0 + drawH / 2}
+                textAnchor="middle"
+                fontWeight={500}
+                fill={dimFill}
+                transform={`rotate(-90 ${x0 - 42} ${y0 + drawH / 2})`}
+              >
+                {openingHeight}
+              </text>
+
+              {/* Ширина (низ) */}
+              <line
+                x1={x0}
+                y1={y0 + drawH + 26}
+                x2={x0}
+                y2={y0 + drawH + 46}
+                stroke={dimStroke}
+                strokeWidth={lineW}
+              />
+              <line
+                x1={x0 + drawW}
+                y1={y0 + drawH + 26}
+                x2={x0 + drawW}
+                y2={y0 + drawH + 46}
+                stroke={dimStroke}
+                strokeWidth={lineW}
+              />
+              <line
+                x1={x0}
+                y1={y0 + drawH + 36}
+                x2={x0 + drawW}
+                y2={y0 + drawH + 36}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              <line
+                x1={x0 - 4}
+                y1={y0 + drawH + 32}
+                x2={x0 + 4}
+                y2={y0 + drawH + 40}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              <line
+                x1={x0 + drawW - 4}
+                y1={y0 + drawH + 32}
+                x2={x0 + drawW + 4}
+                y2={y0 + drawH + 40}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              <text
+                x={x0 + drawW / 2}
+                y={y0 + drawH + 56}
+                textAnchor="middle"
+                fontWeight={500}
+                fill={dimFill}
+              >
+                {openingWidth} × {openingHeight} мм
+              </text>
+            </g>
+          );
+        })()}
       </svg>
     </div>
   );
