@@ -74,26 +74,39 @@ function Index() {
         </div>
 
         {/* Легенда */}
-        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-md border bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">Условные обозначения:</span>
-          <span className="inline-flex items-center gap-2">
-            <span className="inline-block h-3 w-6 rounded-sm bg-foreground" />
-            подвижная створка
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <span className="inline-block h-3 w-6 rounded-sm bg-muted border" />
-            стационар
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <span
-              className="inline-block h-3 w-6 rounded-sm border"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(45deg, hsl(var(--muted-foreground) / 0.4) 0 1px, transparent 1px 4px)",
-              }}
-            />
-            стена
-          </span>
+        <div className="mt-8 rounded-md border bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
+          <div className="mb-2 font-mono font-medium uppercase tracking-wider text-foreground">
+            Условные обозначения
+          </div>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono">
+            <span className="inline-flex items-center gap-2">
+              <span className="inline-block h-3 w-6 bg-foreground" />
+              подвижная створка
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="inline-block h-3 w-6 border border-foreground bg-muted" />
+              стационар (СТАЦ)
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span
+                className="inline-block h-3 w-6 border border-foreground"
+                style={{
+                  backgroundImage:
+                    "repeating-linear-gradient(45deg, hsl(var(--foreground) / 0.55) 0 0.6px, transparent 0.6px 4px)",
+                }}
+              />
+              стена
+            </span>
+            <span>Л / П — направление открывания</span>
+            <span className="rounded-sm border border-primary bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-primary">
+              SYNC
+            </span>
+            <span>синхронное открытие</span>
+            <span className="rounded-sm border border-foreground/50 bg-foreground/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-foreground/75">
+              CASC
+            </span>
+            <span>каскадная система</span>
+          </div>
         </div>
       </main>
     </div>
