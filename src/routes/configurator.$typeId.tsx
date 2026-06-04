@@ -221,7 +221,9 @@ function ConfiguratorPage() {
                   onValueChange={(v) => setS({ ...s, glassId: v })}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue>
+                      {GLASSES.find((g) => g.id === s.glassId)?.name ?? "—"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {GLASSES.map((g) => (
@@ -239,7 +241,12 @@ function ConfiguratorPage() {
                   onValueChange={(v) => setS({ ...s, profileId: v })}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue>
+                      {(() => {
+                        const p = PROFILES.find((p) => p.id === s.profileId);
+                        return p ? `${p.code} — ${p.name}` : "—";
+                      })()}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {PROFILES.map((p) => (
@@ -264,7 +271,14 @@ function ConfiguratorPage() {
                   onValueChange={(v) => setS({ ...s, modelId: v })}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue>
+                      {(() => {
+                        const m = PARTITION_MODELS.find((m) => m.id === s.modelId);
+                        return m
+                          ? `${m.code}${m.price > 0 ? ` (+${formatRub(m.price)})` : " (базовая)"}`
+                          : "—";
+                      })()}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {PARTITION_MODELS.map((m) => (
@@ -282,7 +296,15 @@ function ConfiguratorPage() {
                   onValueChange={(v) => setS({ ...s, handleCount: Number(v) })}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue>
+                      {s.handleCount}{" "}
+                      {s.handleCount === 1
+                        ? "ручка"
+                        : s.handleCount < 5
+                          ? "ручки"
+                          : "ручек"}{" "}
+                      — {formatRub(HANDLE_COUNT_PRICES[s.handleCount] ?? 0)}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {handleCountOptions.map((n) => (
