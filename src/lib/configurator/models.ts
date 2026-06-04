@@ -1,11 +1,11 @@
-export interface HandleModel {
+export interface PartitionModel {
   id: string;
   code: string;
   /** Надбавка к цене за створку */
   price: number;
 }
 
-export const HANDLE_MODELS: HandleModel[] = [
+export const PARTITION_MODELS: PartitionModel[] = [
   { id: "m1", code: "BR ALP 01", price: 0 },
   { id: "m2", code: "BR ALP 02", price: 2310 },
   { id: "m3", code: "BR ALP 03", price: 2888 },
