@@ -1,28 +1,58 @@
 import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
 import type { PartitionType, OpeningOption } from "@/lib/configurator/types";
-import alp01 from "@/assets/models/alp-01.png.asset.json";
-import alp02 from "@/assets/models/alp-02.png.asset.json";
-import alp03 from "@/assets/models/alp-03.png.asset.json";
-import alp04 from "@/assets/models/alp-04.png.asset.json";
-import alp05 from "@/assets/models/alp-05.png.asset.json";
-import alp06 from "@/assets/models/alp-06.png.asset.json";
-import alp07 from "@/assets/models/alp-07.png.asset.json";
-import alp08 from "@/assets/models/alp-08.png.asset.json";
-import alp09 from "@/assets/models/alp-09.png.asset.json";
-import alp10 from "@/assets/models/alp-10.png.asset.json";
 
-const MODEL_IMAGES: Record<string, string> = {
-  m1: alp01.url,
-  m2: alp02.url,
-  m3: alp03.url,
-  m4: alp04.url,
-  m5: alp05.url,
-  m6: alp06.url,
-  m7: alp07.url,
-  m8: alp08.url,
-  m9: alp09.url,
-  m10: alp10.url,
+/**
+ * Раскладка импостов (внутренних перемычек) для каждой модели ALP.
+ * Координаты в долях створки: x ∈ [0..1] по ширине, y ∈ [0..1] по высоте.
+ * Соответствует фото моделей в /src/assets/models.
+ */
+type Mullion =
+  | { type: "h"; y: number; x1?: number; x2?: number }
+  | { type: "v"; x: number; y1?: number; y2?: number };
+
+const MODEL_MULLIONS: Record<string, Mullion[]> = {
+  // ALP 01 — цельное полотно
+  m1: [],
+  // ALP 02 — вертикальная перемычка по центру
+  m2: [{ type: "v", x: 0.5 }],
+  // ALP 03 — вертикаль по центру + горизонталь в верхней четверти
+  m3: [
+    { type: "v", x: 0.5 },
+    { type: "h", y: 0.25 },
+  ],
+  // ALP 04 — сетка 2×4 (вертикаль + 3 горизонтали)
+  m4: [
+    { type: "v", x: 0.5 },
+    { type: "h", y: 0.25 },
+    { type: "h", y: 0.5 },
+    { type: "h", y: 0.75 },
+  ],
+  // ALP 05 — верхняя фрамуга с вертикалью в ней
+  m5: [
+    { type: "h", y: 0.18 },
+    { type: "v", x: 0.5, y1: 0, y2: 0.18 },
+  ],
+  // ALP 06 — горизонталь по центру
+  m6: [{ type: "h", y: 0.5 }],
+  // ALP 07 — две горизонтали (трети)
+  m7: [
+    { type: "h", y: 0.33 },
+    { type: "h", y: 0.66 },
+  ],
+  // ALP 08 — нижняя цокольная фрамуга
+  m8: [{ type: "h", y: 0.85 }],
+  // ALP 09 — верх и нижняя треть
+  m9: [
+    { type: "h", y: 0.18 },
+    { type: "h", y: 0.7 },
+  ],
+  // ALP 10 — верхняя и нижняя фрамуги + центральная вертикаль между ними
+  m10: [
+    { type: "h", y: 0.15 },
+    { type: "h", y: 0.85 },
+    { type: "v", x: 0.5, y1: 0.15, y2: 0.85 },
+  ],
 };
 
 interface Props {
