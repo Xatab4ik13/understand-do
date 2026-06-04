@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getPartitionType, type PartitionType } from "@/lib/configurator/types";
 import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
@@ -17,10 +17,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, AlertTriangle, Copy } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { PartitionProjection } from "@/components/configurator/PartitionProjection";
+import { exportOrderToPdf } from "@/lib/configurator/exportPdf";
+import logoAsset from "@/assets/logo.svg.asset.json";
 
 export const Route = createFileRoute("/configurator/$typeId")({
   head: ({ params }) => ({
@@ -136,39 +138,54 @@ function ConfiguratorPage() {
 
   const maxH = maxOpeningHeight(type, s.glassId);
 
-  const summary = buildSummary(type.name, s, result);
+  const summaryLines = useMemo(
+    () => buildSummaryLines(type.name, s, result),
+    [type, s, result],
+  );
 
-  const onCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(summary);
-      toast.success("Конфигурация скопирована");
-    } catch {
-      toast.error("Не удалось скопировать");
+  const projectionWrapRef = useRef<HTMLDivElement | null>(null);
+
+  const onDownloadPdf = async () => {
+    const svg = projectionWrapRef.current?.querySelector("svg") as
+      | SVGSVGElement
+      | null;
+    if (!svg) {
+      toast.error("Не удалось получить проекцию");
+      return;
     }
-  };
-
-  const onDownload = () => {
-    const blob = new Blob([summary], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${type.id}-заказ.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      await exportOrderToPdf({
+        fileName: `${type.id}-заказ.pdf`,
+        projectionSvg: svg,
+        title: type.name,
+        lines: summaryLines,
+      });
+      toast.success("PDF сохранён");
+    } catch (e) {
+      console.error(e);
+      toast.error("Не удалось сформировать PDF");
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Toaster richColors />
       <header className="border-b">
-        <div className="mx-auto max-w-6xl px-6 py-4">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" /> К выбору типа
-          </Link>
-          <h1 className="mt-2 text-xl font-semibold">{type.name}</h1>
+        <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
+          <img
+            src={logoAsset.url}
+            alt="Логотип"
+            className="h-16 w-auto md:h-20"
+          />
+          <div className="min-w-0 flex-1">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" /> К выбору типа
+            </Link>
+            <h1 className="mt-1 truncate text-xl font-semibold">{type.name}</h1>
+          </div>
         </div>
       </header>
 
@@ -325,18 +342,20 @@ function ConfiguratorPage() {
               <CardTitle className="text-base">Проекция</CardTitle>
             </CardHeader>
             <CardContent>
-              <PartitionProjection
-                type={type}
-                openingHeight={s.openingHeight}
-                openingWidth={s.openingWidth}
-                sashWidth={result.sashWidth}
-                sashHeight={result.sashHeight}
-                glassId={s.glassId}
-                profileId={s.profileId}
-                modelId={s.modelId}
-                openings={s.openings}
-                handlePositions={s.handlePositions}
-              />
+              <div ref={projectionWrapRef}>
+                <PartitionProjection
+                  type={type}
+                  openingHeight={s.openingHeight}
+                  openingWidth={s.openingWidth}
+                  sashWidth={result.sashWidth}
+                  sashHeight={result.sashHeight}
+                  glassId={s.glassId}
+                  profileId={s.profileId}
+                  modelId={s.modelId}
+                  openings={s.openings}
+                  handlePositions={s.handlePositions}
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -489,14 +508,9 @@ function ConfiguratorPage() {
             </CardContent>
           </Card>
 
-          <div className="flex gap-2">
-            <Button onClick={onCopy} variant="outline" className="flex-1">
-              <Copy className="mr-2 h-4 w-4" /> Скопировать
-            </Button>
-            <Button onClick={onDownload} className="flex-1">
-              Скачать заказ
-            </Button>
-          </div>
+          <Button onClick={onDownloadPdf} className="w-full">
+            <Download className="mr-2 h-4 w-4" /> Скачать PDF
+          </Button>
         </aside>
       </main>
     </div>
@@ -593,17 +607,16 @@ function HandlePositionPicker({
   );
 }
 
-function buildSummary(
+function buildSummaryLines(
   typeName: string,
   s: Selections,
   r: ReturnType<typeof calculate>,
-): string {
+): string[] {
   const glass = GLASSES.find((g) => g.id === s.glassId)?.name ?? "—";
   const profile = PROFILES.find((p) => p.id === s.profileId);
   const model = PARTITION_MODELS.find((m) => m.id === s.modelId)?.code ?? "—";
   const lines = [
-    `ЗАКАЗ: ${typeName}`,
-    `--------------------------------`,
+    `Тип: ${typeName}`,
     `Высота проёма: ${s.openingHeight} мм`,
     `Ширина проёма: ${s.openingWidth} мм`,
     `Высота створки: ${Math.round(r.sashHeight)} мм`,
@@ -628,6 +641,6 @@ function buildSummary(
       : "",
     `Цена общая: ${formatRub(r.totalWithMarkup)}`,
     `Цена РРЦ (+70%): ${formatRub(r.rrcPrice)}`,
-  ].filter(Boolean);
-  return lines.join("\n");
+  ];
+  return lines.filter((l) => l !== null && l !== undefined) as string[];
 }
