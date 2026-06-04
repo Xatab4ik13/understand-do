@@ -346,7 +346,12 @@ function ConfiguratorPage() {
                         disabled={displaySets.length === 1}
                       >
                         <SelectTrigger>
-                          <SelectValue />
+                          <SelectValue>
+                            {(() => {
+                              const set = SETS[s.setIds[idx]];
+                              return set ? `${set.name} — ${formatRub(set.price)}` : "—";
+                            })()}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {displaySets.map((setId) => {
@@ -367,7 +372,7 @@ function ConfiguratorPage() {
                         disabled={sash.allowedOpenings.length === 1}
                       >
                         <SelectTrigger>
-                          <SelectValue />
+                          <SelectValue>{s.openings[idx]}</SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {sash.allowedOpenings.map((o) => (
