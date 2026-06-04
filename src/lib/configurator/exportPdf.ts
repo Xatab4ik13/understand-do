@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import logoAsset from "@/assets/logo.svg.asset.json";
+import logoUrl from "@/assets/logo.svg?url";
 
 function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -110,7 +110,7 @@ function parseLines(lines: string[]): {
 
 export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   const [logoImg, svgImg] = await Promise.all([
-    loadImage(logoAsset.url).catch(() => null),
+    loadImage(logoUrl).catch(() => null),
     svgToImage(opts.projectionSvg),
   ]);
 

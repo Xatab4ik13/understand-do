@@ -3,7 +3,7 @@ import { PARTITION_TYPES } from "@/lib/configurator/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatRub } from "@/lib/configurator/calculate";
 import { TypeScheme } from "@/components/configurator/TypeScheme";
-import logoAsset from "@/assets/logo.svg.asset.json";
+import logoUrl from "@/assets/logo.svg?url";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,7 +21,7 @@ function Index() {
       <header className="border-b">
         <div className="mx-auto max-w-6xl px-6 py-6">
           <img
-            src={logoAsset.url}
+            src={logoUrl}
             alt="Логотип"
             className="h-20 w-auto md:h-24"
           />
