@@ -322,6 +322,25 @@ function ConfiguratorPage() {
 
           <Card>
             <CardHeader>
+              <CardTitle className="text-base">Проекция</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PartitionProjection
+                type={type}
+                openingHeight={s.openingHeight}
+                openingWidth={s.openingWidth}
+                sashWidth={result.sashWidth}
+                sashHeight={result.sashHeight}
+                glassId={s.glassId}
+                profileId={s.profileId}
+                openings={s.openings}
+                handlePositions={s.handlePositions}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle className="text-base">Створки</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
