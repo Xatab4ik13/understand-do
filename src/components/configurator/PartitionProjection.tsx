@@ -446,110 +446,121 @@ export function PartitionProjection({
         />
 
         {/* ===== РАЗМЕРНЫЕ ЛИНИИ ===== */}
-        {/* Высота (слева) */}
-        <g
-          fontFamily="ui-sans-serif, system-ui"
-          fontSize="11"
-          fill="hsl(var(--muted-foreground))"
-          stroke="hsl(var(--muted-foreground))"
-        >
-          <line x1={x0 - 4} y1={y0} x2={x0 - 38} y2={y0} strokeWidth={0.5} />
-          <line
-            x1={x0 - 4}
-            y1={y0 + drawH}
-            x2={x0 - 38}
-            y2={y0 + drawH}
-            strokeWidth={0.5}
-          />
-          <line x1={x0 - 30} y1={y0} x2={x0 - 30} y2={y0 + drawH} strokeWidth={0.8} />
-          <line x1={x0 - 34} y1={y0 - 4} x2={x0 - 26} y2={y0 + 4} strokeWidth={0.8} />
-          <line
-            x1={x0 - 34}
-            y1={y0 + drawH - 4}
-            x2={x0 - 26}
-            y2={y0 + drawH + 4}
-            strokeWidth={0.8}
-          />
-          <rect
-            x={x0 - 48}
-            y={y0 + drawH / 2 - 9}
-            width={36}
-            height={18}
-            fill="hsl(var(--background))"
-            stroke="none"
-          />
-          <text
-            x={x0 - 30}
-            y={y0 + drawH / 2}
-            textAnchor="middle"
-            stroke="none"
-            fontWeight={500}
-            transform={`rotate(-90 ${x0 - 30} ${y0 + drawH / 2})`}
-          >
-            {openingHeight}
-          </text>
-        </g>
+        {(() => {
+          const dimStroke = "hsl(var(--muted-foreground))";
+          const dimFill = "hsl(var(--muted-foreground))";
+          const tickW = 0.8;
+          const lineW = 0.5;
+          return (
+            <g fontFamily="ui-sans-serif, system-ui" fontSize="11">
+              {/* Высота (слева) */}
+              {/* Выносные линии от рамы */}
+              <line
+                x1={x0 - 4}
+                y1={y0}
+                x2={x0 - 38}
+                y2={y0}
+                stroke={dimStroke}
+                strokeWidth={lineW}
+              />
+              <line
+                x1={x0 - 4}
+                y1={y0 + drawH}
+                x2={x0 - 38}
+                y2={y0 + drawH}
+                stroke={dimStroke}
+                strokeWidth={lineW}
+              />
+              {/* Размерная линия */}
+              <line
+                x1={x0 - 30}
+                y1={y0}
+                x2={x0 - 30}
+                y2={y0 + drawH}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              {/* Засечки */}
+              <line
+                x1={x0 - 34}
+                y1={y0 - 4}
+                x2={x0 - 26}
+                y2={y0 + 4}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              <line
+                x1={x0 - 34}
+                y1={y0 + drawH - 4}
+                x2={x0 - 26}
+                y2={y0 + drawH + 4}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              <text
+                x={x0 - 42}
+                y={y0 + drawH / 2}
+                textAnchor="middle"
+                fontWeight={500}
+                fill={dimFill}
+                transform={`rotate(-90 ${x0 - 42} ${y0 + drawH / 2})`}
+              >
+                {openingHeight}
+              </text>
 
-        {/* Ширина (низ) */}
-        <g
-          fontFamily="ui-sans-serif, system-ui"
-          fontSize="11"
-          fill="hsl(var(--muted-foreground))"
-          stroke="hsl(var(--muted-foreground))"
-        >
-          <line
-            x1={x0}
-            y1={y0 + drawH + 26}
-            x2={x0}
-            y2={y0 + drawH + 46}
-            strokeWidth={0.5}
-          />
-          <line
-            x1={x0 + drawW}
-            y1={y0 + drawH + 26}
-            x2={x0 + drawW}
-            y2={y0 + drawH + 46}
-            strokeWidth={0.5}
-          />
-          <line
-            x1={x0}
-            y1={y0 + drawH + 38}
-            x2={x0 + drawW}
-            y2={y0 + drawH + 38}
-            strokeWidth={0.8}
-          />
-          <line
-            x1={x0 - 4}
-            y1={y0 + drawH + 34}
-            x2={x0 + 4}
-            y2={y0 + drawH + 42}
-            strokeWidth={0.8}
-          />
-          <line
-            x1={x0 + drawW - 4}
-            y1={y0 + drawH + 34}
-            x2={x0 + drawW + 4}
-            y2={y0 + drawH + 42}
-            strokeWidth={0.8}
-          />
-          <rect
-            x={x0 + drawW / 2 - 50}
-            y={y0 + drawH + 30}
-            width={100}
-            height={16}
-            fill="hsl(var(--background))"
-            stroke="none"
-          />
-          <text
-            x={x0 + drawW / 2}
-            y={y0 + drawH + 42}
-            textAnchor="middle"
-            stroke="none"
-            fontWeight={500}
-          >
-            {openingWidth} × {openingHeight} мм
-          </text>
-        </g>
+              {/* Ширина (низ) */}
+              <line
+                x1={x0}
+                y1={y0 + drawH + 26}
+                x2={x0}
+                y2={y0 + drawH + 46}
+                stroke={dimStroke}
+                strokeWidth={lineW}
+              />
+              <line
+                x1={x0 + drawW}
+                y1={y0 + drawH + 26}
+                x2={x0 + drawW}
+                y2={y0 + drawH + 46}
+                stroke={dimStroke}
+                strokeWidth={lineW}
+              />
+              <line
+                x1={x0}
+                y1={y0 + drawH + 36}
+                x2={x0 + drawW}
+                y2={y0 + drawH + 36}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              <line
+                x1={x0 - 4}
+                y1={y0 + drawH + 32}
+                x2={x0 + 4}
+                y2={y0 + drawH + 40}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              <line
+                x1={x0 + drawW - 4}
+                y1={y0 + drawH + 32}
+                x2={x0 + drawW + 4}
+                y2={y0 + drawH + 40}
+                stroke={dimStroke}
+                strokeWidth={tickW}
+              />
+              <text
+                x={x0 + drawW / 2}
+                y={y0 + drawH + 56}
+                textAnchor="middle"
+                fontWeight={500}
+                fill={dimFill}
+              >
+                {openingWidth} × {openingHeight} мм
+              </text>
+            </g>
+          );
+        })()}
       </svg>
     </div>
   );
