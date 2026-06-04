@@ -1,27 +1,36 @@
-import type { PartitionType, SashConfig } from "@/lib/configurator/types";
+import type { PartitionType } from "@/lib/configurator/types";
 
 /**
- * Схема типа перегородки в виде сверху.
- * Слева и справа — стены (заштрихованные блоки).
- * Между ними — створки в один ряд:
- *   • стационар — светлая заливка, без стрелки
- *   • подвижная — тёмная заливка со стрелкой направления
- * Под каскадными створками (Сет 5) рисуется параллельная направляющая.
- * Над синхронными (Сет 4) — символ синхронизации.
+ * Технический чертёж типа перегородки (вид сверху).
+ * Стиль: blueprint / CAD — тонкие линии, монопространственные подписи,
+ * размерные засечки, штриховка стен, маркировка створок.
  */
 export function TypeScheme({ type }: { type: PartitionType }) {
-  const W = 320;
-  const H = 88;
-  const wallW = 22;
-  const trackY = 50;
-  const sashH = 16;
+  const W = 360;
+  const H = 132;
+  const wallW = 24;
+  const trackY = 78;
+  const sashH = 18;
   const gap = 2;
 
   const sashes = type.sashes;
   const innerW = W - wallW * 2;
   const sashW = (innerW - gap * (sashes.length - 1)) / sashes.length;
-
   const hasSync = sashes.some((s) => s.allowedSets.includes("set4"));
+  const hasCascade = sashes.some((s) => s.allowedSets.includes("set5"));
+
+  const sashTop = trackY - sashH / 2;
+  const sashBot = trackY + sashH / 2;
+
+  // Краткое обозначение направления открывания
+  const dirLabel = (openings: string[]) => {
+    const l = openings.includes("Левое");
+    const r = openings.includes("Правое");
+    if (l && r) return "Л/П";
+    if (l) return "Л";
+    if (r) return "П";
+    return "";
+  };
 
   return (
     <svg
@@ -31,145 +40,308 @@ export function TypeScheme({ type }: { type: PartitionType }) {
       aria-label={`Схема: ${type.name}`}
     >
       <defs>
+        {/* Штриховка стен */}
         <pattern
           id="wallHatch"
-          width="6"
-          height="6"
+          width="5"
+          height="5"
           patternUnits="userSpaceOnUse"
           patternTransform="rotate(45)"
         >
-          <rect width="6" height="6" fill="hsl(var(--muted))" />
+          <rect width="5" height="5" fill="hsl(var(--muted))" />
           <line
             x1="0"
             y1="0"
             x2="0"
-            y2="6"
-            stroke="hsl(var(--muted-foreground))"
-            strokeOpacity="0.45"
-            strokeWidth="1"
+            y2="5"
+            stroke="hsl(var(--foreground))"
+            strokeOpacity="0.55"
+            strokeWidth="0.6"
+          />
+        </pattern>
+        {/* Технический grid */}
+        <pattern id="bpGrid" width="8" height="8" patternUnits="userSpaceOnUse">
+          <path
+            d="M 8 0 L 0 0 0 8"
+            fill="none"
+            stroke="hsl(var(--foreground))"
+            strokeOpacity="0.06"
+            strokeWidth="0.5"
           />
         </pattern>
       </defs>
 
-      {/* Левая стена */}
+      {/* Подложка-чертёж */}
+      <rect x={0} y={0} width={W} height={H} fill="url(#bpGrid)" />
+
+      {/* Верхняя размерная линия (общий проём) */}
+      <g
+        stroke="hsl(var(--foreground))"
+        strokeOpacity="0.55"
+        strokeWidth="0.6"
+        fill="none"
+      >
+        <line x1={wallW} y1={20} x2={W - wallW} y2={20} />
+        <line x1={wallW} y1={16} x2={wallW} y2={24} />
+        <line x1={W - wallW} y1={16} x2={W - wallW} y2={24} />
+      </g>
+      <text
+        x={W / 2}
+        y={14}
+        textAnchor="middle"
+        fontSize="8"
+        fontFamily="ui-monospace, SFMono-Regular, monospace"
+        fill="hsl(var(--muted-foreground))"
+        letterSpacing="0.5"
+      >
+        ПРОЁМ
+      </text>
+
+      {/* Размерные засечки границ створок */}
+      <g
+        stroke="hsl(var(--foreground))"
+        strokeOpacity="0.4"
+        strokeWidth="0.5"
+      >
+        {sashes.map((_, i) => {
+          const x = wallW + i * (sashW + gap);
+          return (
+            <g key={`tick-${i}`}>
+              <line x1={x} y1={28} x2={x} y2={34} />
+              {i === sashes.length - 1 && (
+                <line x1={x + sashW} y1={28} x2={x + sashW} y2={34} />
+              )}
+            </g>
+          );
+        })}
+      </g>
+
+      {/* Номера створок */}
+      {sashes.map((_, i) => {
+        const x = wallW + i * (sashW + gap) + sashW / 2;
+        return (
+          <text
+            key={`num-${i}`}
+            x={x}
+            y={44}
+            textAnchor="middle"
+            fontSize="9"
+            fontFamily="ui-monospace, SFMono-Regular, monospace"
+            fill="hsl(var(--muted-foreground))"
+          >
+            {String(i + 1).padStart(2, "0")}
+          </text>
+        );
+      })}
+
+      {/* Стены (по бокам) */}
       <rect
         x={0}
-        y={trackY - sashH - 6}
+        y={sashTop - 8}
         width={wallW}
-        height={sashH + 12}
+        height={sashH + 16}
         fill="url(#wallHatch)"
-        stroke="hsl(var(--border))"
+        stroke="hsl(var(--foreground))"
+        strokeWidth="0.8"
       />
-      {/* Правая стена */}
       <rect
         x={W - wallW}
-        y={trackY - sashH - 6}
+        y={sashTop - 8}
         width={wallW}
-        height={sashH + 12}
+        height={sashH + 16}
         fill="url(#wallHatch)"
-        stroke="hsl(var(--border))"
+        stroke="hsl(var(--foreground))"
+        strokeWidth="0.8"
       />
 
-      {/* Направляющая (рельс) */}
+      {/* Базовая линия пола (тонкая ось) */}
       <line
         x1={wallW}
-        y1={trackY + sashH / 2 + 5}
+        y1={sashBot + 4}
         x2={W - wallW}
-        y2={trackY + sashH / 2 + 5}
-        stroke="hsl(var(--border))"
-        strokeWidth="1"
+        y2={sashBot + 4}
+        stroke="hsl(var(--foreground))"
+        strokeOpacity="0.35"
+        strokeWidth="0.5"
+      />
+      {/* Осевая (центр) */}
+      <line
+        x1={W / 2}
+        y1={sashTop - 10}
+        x2={W / 2}
+        y2={sashBot + 10}
+        stroke="hsl(var(--foreground))"
+        strokeOpacity="0.25"
+        strokeWidth="0.4"
+        strokeDasharray="2 3"
       />
 
       {/* Створки */}
       {sashes.map((sash, i) => {
         const x = wallW + i * (sashW + gap);
-        const y = trackY - sashH / 2;
         const isStationary = !sash.hasHandle;
         const isCascade = sash.allowedSets.includes("set5");
-
-        const fill = isStationary
-          ? "hsl(var(--muted))"
-          : "hsl(var(--foreground))";
-        const stroke = "hsl(var(--foreground))";
+        const cx = x + sashW / 2;
 
         return (
           <g key={i}>
-            {/* Каскадная параллельная направляющая */}
+            {/* Параллельная направляющая для каскада */}
             {isCascade && (
               <line
-                x1={x}
-                y1={y + sashH + 8}
-                x2={x + sashW}
-                y2={y + sashH + 8}
-                stroke="hsl(var(--muted-foreground))"
-                strokeWidth="0.8"
+                x1={x + 1}
+                y1={sashBot + 8}
+                x2={x + sashW - 1}
+                y2={sashBot + 8}
+                stroke="hsl(var(--foreground))"
+                strokeOpacity="0.5"
+                strokeWidth="0.6"
                 strokeDasharray="2 2"
               />
             )}
 
-            {/* Створка */}
             <rect
               x={x}
-              y={y}
+              y={sashTop}
               width={sashW}
               height={sashH}
-              fill={fill}
-              stroke={stroke}
+              fill={
+                isStationary
+                  ? "hsl(var(--muted))"
+                  : "hsl(var(--foreground))"
+              }
+              stroke="hsl(var(--foreground))"
               strokeWidth="0.8"
-              rx="1"
             />
 
+            {/* Содержимое створки */}
             {isStationary ? (
-              // Метка стационара — маленький квадрат по центру
-              <rect
-                x={x + sashW / 2 - 2}
-                y={y + sashH / 2 - 2}
-                width="4"
-                height="4"
-                fill="hsl(var(--background))"
-                stroke="hsl(var(--muted-foreground))"
-                strokeWidth="0.6"
-              />
+              <>
+                {/* Диагонали — обозначение стационара */}
+                <line
+                  x1={x + 2}
+                  y1={sashTop + 2}
+                  x2={x + sashW - 2}
+                  y2={sashBot - 2}
+                  stroke="hsl(var(--muted-foreground))"
+                  strokeOpacity="0.7"
+                  strokeWidth="0.5"
+                />
+                <line
+                  x1={x + sashW - 2}
+                  y1={sashTop + 2}
+                  x2={x + 2}
+                  y2={sashBot - 2}
+                  stroke="hsl(var(--muted-foreground))"
+                  strokeOpacity="0.7"
+                  strokeWidth="0.5"
+                />
+                {sashW > 36 && (
+                  <text
+                    x={cx}
+                    y={trackY + 2}
+                    textAnchor="middle"
+                    fontSize="7"
+                    fontFamily="ui-monospace, SFMono-Regular, monospace"
+                    fill="hsl(var(--muted-foreground))"
+                    letterSpacing="0.5"
+                  >
+                    СТАЦ
+                  </text>
+                )}
+              </>
             ) : (
-              // Стрелка направления открывания
-              <Arrow
-                cx={x + sashW / 2}
-                cy={y + sashH / 2}
-                width={Math.min(sashW * 0.55, 36)}
-                openings={sash.allowedOpenings as string[]}
-              />
+              <>
+                <Arrow
+                  cx={cx}
+                  cy={trackY}
+                  width={Math.min(sashW * 0.6, 40)}
+                  openings={sash.allowedOpenings as string[]}
+                />
+                {/* Подпись направления под створкой */}
+                <text
+                  x={cx}
+                  y={sashBot + 14}
+                  textAnchor="middle"
+                  fontSize="7.5"
+                  fontFamily="ui-monospace, SFMono-Regular, monospace"
+                  fill="hsl(var(--foreground))"
+                  fillOpacity="0.7"
+                >
+                  {dirLabel(sash.allowedOpenings as string[])}
+                </text>
+              </>
             )}
           </g>
         );
       })}
 
-      {/* Иконка синхронизации над парой створок */}
-      {hasSync && (
-        <g transform={`translate(${W / 2 - 18}, 6)`}>
-          <rect
-            x={0}
-            y={0}
-            width={36}
-            height={14}
-            rx={7}
-            fill="hsl(var(--primary) / 0.12)"
-            stroke="hsl(var(--primary))"
-            strokeWidth="0.6"
-          />
-          <text
-            x={18}
-            y={10}
-            textAnchor="middle"
-            fontSize="8"
-            fontFamily="ui-sans-serif, system-ui"
-            fill="hsl(var(--primary))"
-            fontWeight="600"
-            letterSpacing="0.5"
-          >
-            SYNC
-          </text>
-        </g>
-      )}
+      {/* Бейджи системы (SYNC / CASCADE) */}
+      <g
+        fontFamily="ui-monospace, SFMono-Regular, monospace"
+        fontSize="7"
+        fontWeight="600"
+      >
+        {hasSync && (
+          <g transform={`translate(${W - 86}, ${H - 14})`}>
+            <rect
+              x={0}
+              y={0}
+              width={38}
+              height={11}
+              rx={2}
+              fill="hsl(var(--primary) / 0.12)"
+              stroke="hsl(var(--primary))"
+              strokeWidth="0.5"
+            />
+            <text
+              x={19}
+              y={8}
+              textAnchor="middle"
+              fill="hsl(var(--primary))"
+              letterSpacing="0.8"
+            >
+              SYNC
+            </text>
+          </g>
+        )}
+        {hasCascade && (
+          <g transform={`translate(${W - 44}, ${H - 14})`}>
+            <rect
+              x={0}
+              y={0}
+              width={38}
+              height={11}
+              rx={2}
+              fill="hsl(var(--foreground) / 0.08)"
+              stroke="hsl(var(--foreground))"
+              strokeOpacity="0.5"
+              strokeWidth="0.5"
+            />
+            <text
+              x={19}
+              y={8}
+              textAnchor="middle"
+              fill="hsl(var(--foreground))"
+              fillOpacity="0.75"
+              letterSpacing="0.8"
+            >
+              CASC
+            </text>
+          </g>
+        )}
+      </g>
+
+      {/* Подпись количества створок (нижний левый угол) */}
+      <text
+        x={4}
+        y={H - 5}
+        fontSize="7"
+        fontFamily="ui-monospace, SFMono-Regular, monospace"
+        fill="hsl(var(--muted-foreground))"
+        letterSpacing="0.5"
+      >
+        N = {sashes.length}
+      </text>
     </svg>
   );
 }
@@ -188,13 +360,13 @@ function Arrow({
   const hasLeft = openings.includes("Левое");
   const hasRight = openings.includes("Правое");
   const half = width / 2;
-  const head = 3.5;
+  const head = 3;
   const color = "hsl(var(--background))";
   const x1 = cx - half;
   const x2 = cx + half;
 
   return (
-    <g stroke={color} strokeWidth="1.2" fill="none" strokeLinecap="round">
+    <g stroke={color} strokeWidth="1" fill="none" strokeLinecap="round">
       <line x1={x1} y1={cy} x2={x2} y2={cy} />
       {hasLeft && (
         <polyline points={`${x1 + head},${cy - head} ${x1},${cy} ${x1 + head},${cy + head}`} />
@@ -205,6 +377,3 @@ function Arrow({
     </g>
   );
 }
-
-// Подавить неиспользуемое предупреждение на SashConfig (если tree-shaking ругнётся)
-export type _SashConfig = SashConfig;
