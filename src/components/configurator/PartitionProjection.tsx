@@ -100,10 +100,10 @@ export function PartitionProjection({
   handlePositions,
 }: Props) {
   // ---- Каркас ----
-  const PAD_L = 56;
+  const PAD_L = 64;
   const PAD_R = 28;
   const PAD_T = 28;
-  const PAD_B = 64;
+  const PAD_B = 76;
 
   const MAX_W = 760;
   const MAX_H = 440;
