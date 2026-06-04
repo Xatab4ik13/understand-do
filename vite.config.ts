@@ -8,8 +8,13 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
+    spa: {
+      enabled: true,
+      prerender: { outputPath: "/index" },
+    },
     server: { entry: "server" },
   },
+  // Disable Nitro entirely — we only need the static client bundle for
+  // Timeweb App Platform "React" (static hosting).
+  nitro: false,
 });
