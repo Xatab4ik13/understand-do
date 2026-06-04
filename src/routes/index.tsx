@@ -79,44 +79,6 @@ function Index() {
           ))}
         </div>
 
-        {/* Легенда */}
-        <div className="mt-8 rounded-md border bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
-          <div className="mb-2 font-medium uppercase tracking-wider text-foreground">
-            Условные обозначения
-          </div>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            <span className="inline-flex items-center gap-2">
-              <span
-                className="inline-block h-3 w-6 border border-foreground"
-                style={{
-                  backgroundImage:
-                    "repeating-linear-gradient(45deg, hsl(var(--foreground) / 0.7) 0 1px, transparent 1px 4px)",
-                }}
-              />
-              стена
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <span
-                className="inline-block h-3 w-6 border border-foreground"
-                style={{
-                  backgroundImage:
-                    "repeating-linear-gradient(-45deg, hsl(var(--foreground) / 0.35) 0 0.6px, transparent 0.6px 5px)",
-                }}
-              />
-              стационар
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <span className="inline-flex h-3 w-6 items-center justify-center border border-foreground bg-background">
-                <svg viewBox="0 0 24 8" className="h-2 w-5">
-                  <line x1="3" y1="4" x2="21" y2="4" stroke="currentColor" strokeWidth="1" />
-                  <polyline points="6,1 3,4 6,7" fill="none" stroke="currentColor" strokeWidth="1" />
-                  <polyline points="18,1 21,4 18,7" fill="none" stroke="currentColor" strokeWidth="1" />
-                </svg>
-              </span>
-              подвижная створка (стрелка — направление)
-            </span>
-          </div>
-        </div>
       </main>
     </div>
   );
