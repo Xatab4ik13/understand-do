@@ -1,28 +1,58 @@
 import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
 import type { PartitionType, OpeningOption } from "@/lib/configurator/types";
-import alp01 from "@/assets/models/alp-01.png.asset.json";
-import alp02 from "@/assets/models/alp-02.png.asset.json";
-import alp03 from "@/assets/models/alp-03.png.asset.json";
-import alp04 from "@/assets/models/alp-04.png.asset.json";
-import alp05 from "@/assets/models/alp-05.png.asset.json";
-import alp06 from "@/assets/models/alp-06.png.asset.json";
-import alp07 from "@/assets/models/alp-07.png.asset.json";
-import alp08 from "@/assets/models/alp-08.png.asset.json";
-import alp09 from "@/assets/models/alp-09.png.asset.json";
-import alp10 from "@/assets/models/alp-10.png.asset.json";
 
-const MODEL_IMAGES: Record<string, string> = {
-  m1: alp01.url,
-  m2: alp02.url,
-  m3: alp03.url,
-  m4: alp04.url,
-  m5: alp05.url,
-  m6: alp06.url,
-  m7: alp07.url,
-  m8: alp08.url,
-  m9: alp09.url,
-  m10: alp10.url,
+/**
+ * Раскладка импостов (внутренних перемычек) для каждой модели ALP.
+ * Координаты в долях створки: x ∈ [0..1] по ширине, y ∈ [0..1] по высоте.
+ * Соответствует фото моделей в /src/assets/models.
+ */
+type Mullion =
+  | { type: "h"; y: number; x1?: number; x2?: number }
+  | { type: "v"; x: number; y1?: number; y2?: number };
+
+const MODEL_MULLIONS: Record<string, Mullion[]> = {
+  // ALP 01 — цельное полотно
+  m1: [],
+  // ALP 02 — вертикальная перемычка по центру
+  m2: [{ type: "v", x: 0.5 }],
+  // ALP 03 — вертикаль по центру + горизонталь в верхней четверти
+  m3: [
+    { type: "v", x: 0.5 },
+    { type: "h", y: 0.25 },
+  ],
+  // ALP 04 — сетка 2×4 (вертикаль + 3 горизонтали)
+  m4: [
+    { type: "v", x: 0.5 },
+    { type: "h", y: 0.25 },
+    { type: "h", y: 0.5 },
+    { type: "h", y: 0.75 },
+  ],
+  // ALP 05 — верхняя фрамуга с вертикалью в ней
+  m5: [
+    { type: "h", y: 0.18 },
+    { type: "v", x: 0.5, y1: 0, y2: 0.18 },
+  ],
+  // ALP 06 — горизонталь по центру
+  m6: [{ type: "h", y: 0.5 }],
+  // ALP 07 — две горизонтали (трети)
+  m7: [
+    { type: "h", y: 0.33 },
+    { type: "h", y: 0.66 },
+  ],
+  // ALP 08 — нижняя цокольная фрамуга
+  m8: [{ type: "h", y: 0.85 }],
+  // ALP 09 — верх и нижняя треть
+  m9: [
+    { type: "h", y: 0.18 },
+    { type: "h", y: 0.7 },
+  ],
+  // ALP 10 — верхняя и нижняя фрамуги + центральная вертикаль между ними
+  m10: [
+    { type: "h", y: 0.15 },
+    { type: "h", y: 0.85 },
+    { type: "v", x: 0.5, y1: 0.15, y2: 0.85 },
+  ],
 };
 
 interface Props {
@@ -121,11 +151,13 @@ export function PartitionProjection({
 
   const tint = glassTint(glassId);
   const prof = profileLook(profileId);
-  const photoUrl = MODEL_IMAGES[modelId];
+  const mullions = MODEL_MULLIONS[modelId] ?? [];
   const sashCount = type.sashCount;
   const sashPxW = drawW / sashCount;
   // Толщина рамы профиля — пропорциональна, но не меньше 6 / не больше 12
   const frameT = Math.max(6, Math.min(12, drawW * 0.014));
+  // Толщина импоста — чуть тоньше рамы
+  const mullT = Math.max(4, frameT * 0.7);
 
   const uid = `proj-${modelId}-${profileId}-${glassId}`;
 
@@ -197,40 +229,31 @@ export function PartitionProjection({
             <stop offset="0%" stopColor="white" stopOpacity="0.18" />
             <stop offset="35%" stopColor="white" stopOpacity="0" />
           </linearGradient>
-          {/* Свет сверху (мягкая засветка фотофона) */}
-          <linearGradient id={`${uid}-topLight`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="white" stopOpacity="0.18" />
-            <stop offset="50%" stopColor="white" stopOpacity="0" />
+          {/* Мягкий «фон комнаты» за стеклом — лёгкий вертикальный градиент */}
+          <linearGradient id={`${uid}-roomBg`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f3f5f7" />
+            <stop offset="55%" stopColor="#e6eaee" />
+            <stop offset="100%" stopColor="#d4d9de" />
           </linearGradient>
           {/* Тень от перегородки */}
           <radialGradient id={`${uid}-shadow`} cx="0.5" cy="0" r="0.6">
             <stop offset="0%" stopColor="black" stopOpacity="0.45" />
             <stop offset="100%" stopColor="black" stopOpacity="0" />
           </radialGradient>
-          {/* Скруглённый клип фотофона */}
+          {/* Скруглённый клип */}
           <clipPath id={`${uid}-clip`}>
             <rect x={x0} y={y0} width={drawW} height={drawH} rx={3} ry={3} />
           </clipPath>
         </defs>
 
-        {/* ===== Фон-сцена: фото модели + мягкий верхний свет ===== */}
+        {/* ===== Фон-сцена: нейтральный фон комнаты ===== */}
         <g clipPath={`url(#${uid}-clip)`}>
-          {photoUrl && (
-            <image
-              href={photoUrl}
-              x={x0}
-              y={y0}
-              width={drawW}
-              height={drawH}
-              preserveAspectRatio="xMidYMid slice"
-            />
-          )}
           <rect
             x={x0}
             y={y0}
             width={drawW}
             height={drawH}
-            fill={`url(#${uid}-topLight)`}
+            fill={`url(#${uid}-roomBg)`}
           />
         </g>
 
@@ -304,6 +327,78 @@ export function PartitionProjection({
                 fill={`url(#${uid}-diagSheen)`}
                 pointerEvents="none"
               />
+
+              {/* Импосты (раскладка по модели ALP) */}
+              {mullions.map((m, mi) => {
+                if (m.type === "h") {
+                  const yy = innerY + innerH * m.y;
+                  const x1 = innerX + innerW * (m.x1 ?? 0);
+                  const x2 = innerX + innerW * (m.x2 ?? 1);
+                  return (
+                    <g key={`m-${mi}`}>
+                      <line
+                        x1={x1}
+                        y1={yy}
+                        x2={x2}
+                        y2={yy}
+                        stroke={prof.dark}
+                        strokeWidth={mullT + 1}
+                        strokeOpacity={0.85}
+                      />
+                      <line
+                        x1={x1}
+                        y1={yy}
+                        x2={x2}
+                        y2={yy}
+                        stroke={`url(#${uid}-profGrad)`}
+                        strokeWidth={mullT}
+                      />
+                      <line
+                        x1={x1}
+                        y1={yy - mullT / 2 + 0.5}
+                        x2={x2}
+                        y2={yy - mullT / 2 + 0.5}
+                        stroke={prof.light}
+                        strokeOpacity={0.5}
+                        strokeWidth={0.6}
+                      />
+                    </g>
+                  );
+                }
+                const xx = innerX + innerW * m.x;
+                const y1 = innerY + innerH * (m.y1 ?? 0);
+                const y2 = innerY + innerH * (m.y2 ?? 1);
+                return (
+                  <g key={`m-${mi}`}>
+                    <line
+                      x1={xx}
+                      y1={y1}
+                      x2={xx}
+                      y2={y2}
+                      stroke={prof.dark}
+                      strokeWidth={mullT + 1}
+                      strokeOpacity={0.85}
+                    />
+                    <line
+                      x1={xx}
+                      y1={y1}
+                      x2={xx}
+                      y2={y2}
+                      stroke={`url(#${uid}-profGrad)`}
+                      strokeWidth={mullT}
+                    />
+                    <line
+                      x1={xx - mullT / 2 + 0.5}
+                      y1={y1}
+                      x2={xx - mullT / 2 + 0.5}
+                      y2={y2}
+                      stroke={prof.light}
+                      strokeOpacity={0.5}
+                      strokeWidth={0.6}
+                    />
+                  </g>
+                );
+              })}
 
               {/* Профильная рамка */}
               {drawProfileFrame(sx, sy, sashPxW, drawH, `frame-${i}`)}
