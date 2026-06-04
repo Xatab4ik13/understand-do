@@ -607,17 +607,16 @@ function HandlePositionPicker({
   );
 }
 
-function buildSummary(
+function buildSummaryLines(
   typeName: string,
   s: Selections,
   r: ReturnType<typeof calculate>,
-): string {
+): string[] {
   const glass = GLASSES.find((g) => g.id === s.glassId)?.name ?? "—";
   const profile = PROFILES.find((p) => p.id === s.profileId);
   const model = PARTITION_MODELS.find((m) => m.id === s.modelId)?.code ?? "—";
   const lines = [
-    `ЗАКАЗ: ${typeName}`,
-    `--------------------------------`,
+    `Тип: ${typeName}`,
     `Высота проёма: ${s.openingHeight} мм`,
     `Ширина проёма: ${s.openingWidth} мм`,
     `Высота створки: ${Math.round(r.sashHeight)} мм`,
@@ -642,6 +641,6 @@ function buildSummary(
       : "",
     `Цена общая: ${formatRub(r.totalWithMarkup)}`,
     `Цена РРЦ (+70%): ${formatRub(r.rrcPrice)}`,
-  ].filter(Boolean);
-  return lines.join("\n");
+  ];
+  return lines.filter((l) => l !== null && l !== undefined) as string[];
 }
