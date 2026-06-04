@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, AlertTriangle, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { PartitionProjection } from "@/components/configurator/PartitionProjection";
 
 export const Route = createFileRoute("/configurator/$typeId")({
   head: ({ params }) => ({
@@ -316,6 +317,25 @@ function ConfiguratorPage() {
                   </SelectContent>
                 </Select>
               </Field>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Проекция</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PartitionProjection
+                type={type}
+                openingHeight={s.openingHeight}
+                openingWidth={s.openingWidth}
+                sashWidth={result.sashWidth}
+                sashHeight={result.sashHeight}
+                glassId={s.glassId}
+                profileId={s.profileId}
+                openings={s.openings}
+                handlePositions={s.handlePositions}
+              />
             </CardContent>
           </Card>
 
