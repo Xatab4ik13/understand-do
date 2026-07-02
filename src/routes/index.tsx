@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PARTITION_TYPES } from "@/lib/configurator/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatRub } from "@/lib/configurator/calculate";
-import { TypeScheme } from "@/components/configurator/TypeScheme";
+import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
 import logoUrl from "@/assets/logo.svg?url";
 
 export const Route = createFileRoute("/")({
@@ -44,9 +44,14 @@ function Index() {
               className="group"
             >
               <Card className="h-full overflow-hidden transition-all duration-200 hover:border-primary hover:shadow-lg hover:-translate-y-0.5">
-                {/* Схема — крупно сверху */}
-                <div className="border-b bg-muted/30 px-5 py-6 transition-colors group-hover:bg-muted/50">
-                  <TypeScheme type={t} />
+                {/* Схема-фото типа */}
+                <div className="relative aspect-[4/3] overflow-hidden border-b bg-muted/20">
+                  <img
+                    src={TYPE_IMAGES[t.id]}
+                    alt={t.name}
+                    className="absolute inset-0 h-full w-full object-contain p-4 transition-transform duration-300 group-hover:scale-[1.03]"
+                    loading="lazy"
+                  />
                 </div>
 
                 <CardContent className="p-5">
