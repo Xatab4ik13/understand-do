@@ -23,6 +23,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { PartitionProjection } from "@/components/configurator/PartitionProjection";
 import { exportOrderToPdf } from "@/lib/configurator/exportPdf";
 import logoUrl from "@/assets/logo.svg?url";
+import { TYPE_SCHEMES } from "@/lib/configurator/typeImages";
 
 export const Route = createFileRoute("/configurator/$typeId")({
   head: ({ params }) => ({
@@ -356,6 +357,18 @@ function ConfiguratorPage() {
                   handlePositions={s.handlePositions}
                 />
               </div>
+              {TYPE_SCHEMES[type.id] && (
+                <div className="mt-4 border rounded-md bg-background p-3">
+                  <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+                    Схема типа
+                  </div>
+                  <img
+                    src={TYPE_SCHEMES[type.id]}
+                    alt={`Схема ${type.name}`}
+                    className="w-full h-auto object-contain"
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
 
