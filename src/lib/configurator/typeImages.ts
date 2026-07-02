@@ -1,21 +1,21 @@
 // Интерьерные рендеры — используются на карточках выбора типа (главная)
-import interior1 from "@/assets/interiors/interior_1.jpg.asset.json";
-import interior2 from "@/assets/interiors/interior_2.jpg.asset.json";
-import interior3 from "@/assets/interiors/interior_3.jpg.asset.json";
-import interior4 from "@/assets/interiors/interior_4.jpg.asset.json";
-import interior5 from "@/assets/interiors/interior_5.jpg.asset.json";
-import interior6 from "@/assets/interiors/interior_6.jpg.asset.json";
-import interior7 from "@/assets/interiors/interior_7.jpg.asset.json";
+import interior1 from "@/assets/interiors/interior_1.webp.asset.json";
+import interior2 from "@/assets/interiors/interior_2.webp.asset.json";
+import interior3 from "@/assets/interiors/interior_3.webp.asset.json";
+import interior4 from "@/assets/interiors/interior_4.webp.asset.json";
+import interior5 from "@/assets/interiors/interior_5.webp.asset.json";
+import interior6 from "@/assets/interiors/interior_6.webp.asset.json";
+import interior7 from "@/assets/interiors/interior_7.webp.asset.json";
 
 // Технические схемы — используются рядом с проекцией в конфигураторе
-import scheme1 from "@/assets/types/type1.jpg.asset.json";
-import scheme2 from "@/assets/types/type2.jpg.asset.json";
-import scheme3active from "@/assets/types/type3active.jpg.asset.json";
-import scheme3stat from "@/assets/types/type3stat.jpg.asset.json";
-import scheme4 from "@/assets/types/type4.jpg.asset.json";
-import scheme5 from "@/assets/types/type5.jpg.asset.json";
-import scheme6 from "@/assets/types/type6.jpg.asset.json";
-import scheme7 from "@/assets/types/type7.jpg.asset.json";
+import scheme1 from "@/assets/types/type1.webp.asset.json";
+import scheme2 from "@/assets/types/type2.webp.asset.json";
+import scheme3active from "@/assets/types/type3active.webp.asset.json";
+import scheme3stat from "@/assets/types/type3stat.webp.asset.json";
+import scheme4 from "@/assets/types/type4.webp.asset.json";
+import scheme5 from "@/assets/types/type5.webp.asset.json";
+import scheme6 from "@/assets/types/type6.webp.asset.json";
+import scheme7 from "@/assets/types/type7.webp.asset.json";
 
 // Карточки выбора типа — интерьерные фото
 export const TYPE_IMAGES: Record<string, string> = {
