@@ -99,15 +99,15 @@ export function calculate(
   const glassCost = glassPricePerSqm * totalSqm;
   // Наценка +30% применяется ТОЛЬКО к стоимости стекла (по ТЗ v2)
   const nonStandardMarkup = isNonStandard ? glassCost * NONSTANDARD_MARKUP : 0;
-  const glassCostWithMarkup = glassCost + nonStandardMarkup;
 
-  const basePartPrice = type.basePrice + glassCostWithMarkup;
+  const basePartPrice = type.basePrice + glassCost;
   const modelsPrice = (model?.price ?? 0) * type.sashCount;
   const setsPrice = s.setIds.reduce((sum, id) => sum + (SETS[id]?.price ?? 0), 0);
   const handlesPrice = HANDLE_COUNT_PRICES[s.handleCount] ?? 0;
 
+  // "Цена" — без наценки нестандарта; "Цена общая" — с наценкой
   const totalPrice = basePartPrice + modelsPrice + setsPrice + handlesPrice;
-  const totalWithMarkup = totalPrice; // наценка уже включена в basePartPrice
+  const totalWithMarkup = totalPrice + nonStandardMarkup;
   const rrcPrice = totalWithMarkup * (1 + RRC_MARKUP);
 
   const glassPrice = glassPricePerSqm;
