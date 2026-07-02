@@ -5,7 +5,7 @@ import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
 import { PARTITION_MODELS } from "@/lib/configurator/models";
 import { HANDLE_COUNT_PRICES, SETS } from "@/lib/configurator/sets";
-import { calculate, formatRub, type Selections } from "@/lib/configurator/calculate";
+import { calculate, formatMm, formatRub, type Selections } from "@/lib/configurator/calculate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
