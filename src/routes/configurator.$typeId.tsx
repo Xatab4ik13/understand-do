@@ -5,7 +5,7 @@ import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
 import { PARTITION_MODELS } from "@/lib/configurator/models";
 import { HANDLE_COUNT_PRICES, SETS } from "@/lib/configurator/sets";
-import { calculate, formatRub, type Selections } from "@/lib/configurator/calculate";
+import { calculate, formatMm, formatRub, type Selections } from "@/lib/configurator/calculate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -222,11 +222,11 @@ function ConfiguratorPage() {
               </Field>
               <ReadOnly
                 label="Высота створки"
-                value={`${Math.round(result.sashHeight)} мм`}
+                value={`${formatMm(result.sashHeight)} мм`}
               />
               <ReadOnly
                 label="Ширина створки"
-                value={`${Math.round(result.sashWidth)} мм`}
+                value={`${formatMm(result.sashWidth)} мм`}
               />
               <ReadOnly
                 label={`Кв.м (×${type.sashCount} створ.)`}
@@ -619,8 +619,8 @@ function buildSummaryLines(
     `Тип: ${typeName}`,
     `Высота проёма: ${s.openingHeight} мм`,
     `Ширина проёма: ${s.openingWidth} мм`,
-    `Высота створки: ${Math.round(r.sashHeight)} мм`,
-    `Ширина створки: ${Math.round(r.sashWidth)} мм`,
+    `Высота створки: ${formatMm(r.sashHeight)} мм`,
+    `Ширина створки: ${formatMm(r.sashWidth)} мм`,
     `Площадь: ${r.totalSqm.toFixed(3)} м²`,
     `Стекло: ${glass}`,
     `Профиль: ${profile?.code} (${profile?.name})`,

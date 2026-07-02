@@ -72,7 +72,7 @@ export function calculate(
     if (!widthInStd || !heightInStd) {
       isNonStandard = true;
       warnings.push(
-        `Нестандартный размер створки (${Math.round(sashHeight)}×${Math.round(sashWidth)} мм). Наценка +30%.`,
+        `Нестандартный размер створки (${formatMm(sashHeight)}×${formatMm(sashWidth)} мм). Наценка +30% только к стоимости стекла.`,
       );
     }
     if (
@@ -93,16 +93,22 @@ export function calculate(
     );
   }
 
-  const glassPrice = glass?.pricePerSqm ?? 0;
-  const basePartPrice = type.basePrice + glassPrice * totalSqm;
+  const glassPricePerSqm = glass?.pricePerSqm ?? 0;
+  const glassCost = glassPricePerSqm * totalSqm;
+  // Наценка +30% применяется ТОЛЬКО к стоимости стекла (по ТЗ v2)
+  const nonStandardMarkup = isNonStandard ? glassCost * NONSTANDARD_MARKUP : 0;
+  const glassCostWithMarkup = glassCost + nonStandardMarkup;
+
+  const basePartPrice = type.basePrice + glassCostWithMarkup;
   const modelsPrice = (model?.price ?? 0) * type.sashCount;
   const setsPrice = s.setIds.reduce((sum, id) => sum + (SETS[id]?.price ?? 0), 0);
   const handlesPrice = HANDLE_COUNT_PRICES[s.handleCount] ?? 0;
 
   const totalPrice = basePartPrice + modelsPrice + setsPrice + handlesPrice;
-  const nonStandardMarkup = isNonStandard ? totalPrice * NONSTANDARD_MARKUP : 0;
-  const totalWithMarkup = totalPrice + nonStandardMarkup;
+  const totalWithMarkup = totalPrice; // наценка уже включена в basePartPrice
   const rrcPrice = totalWithMarkup * (1 + RRC_MARKUP);
+
+  const glassPrice = glassPricePerSqm;
 
   return {
     sashHeight,
@@ -131,4 +137,11 @@ export function formatRub(n: number): string {
     currency: "RUB",
     maximumFractionDigits: 0,
   }).format(Math.round(n));
+}
+
+/** Форматирование размера в мм без округления (до 1 знака после запятой) */
+export function formatMm(n: number): string {
+  if (!isFinite(n)) return "—";
+  const rounded = Math.round(n * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
 }
