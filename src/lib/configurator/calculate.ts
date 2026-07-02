@@ -55,7 +55,9 @@ export function calculate(
   const model = PARTITION_MODELS.find((m) => m.id === s.modelId);
 
   if (s.openingHeight <= 0) errors.push("Введите высоту проёма");
+  else if (s.openingHeight < 1000) errors.push("Минимальная высота проёма — 1000 мм");
   if (s.openingWidth <= 0) errors.push("Введите ширину проёма");
+  else if (s.openingWidth < 500) errors.push("Минимальная ширина проёма — 500 мм");
 
   const sashHeight = s.openingHeight + type.sashHeightOffset;
   const sashWidth = type.sashWidthFormula(s.openingWidth);

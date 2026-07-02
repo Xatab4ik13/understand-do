@@ -199,10 +199,15 @@ function ConfiguratorPage() {
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <Field
                 label="Высота проёма (мм)"
-                hint={maxH ? `Макс. для выбранного стекла: ${maxH} мм` : undefined}
+                hint={
+                  maxH
+                    ? `Мин. 1000 мм. Макс. для выбранного стекла: ${maxH} мм`
+                    : "Мин. 1000 мм"
+                }
               >
                 <Input
                   type="number"
+                  min={1000}
                   max={maxH}
                   value={s.openingHeight || ""}
                   onChange={(e) => {
@@ -212,9 +217,10 @@ function ConfiguratorPage() {
                   }}
                 />
               </Field>
-              <Field label="Ширина проёма (мм)">
+              <Field label="Ширина проёма (мм)" hint="Мин. 500 мм">
                 <Input
                   type="number"
+                  min={500}
                   value={s.openingWidth || ""}
                   onChange={(e) =>
                     setS({ ...s, openingWidth: Number(e.target.value) || 0 })
