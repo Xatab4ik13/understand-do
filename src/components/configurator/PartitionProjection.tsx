@@ -1,5 +1,6 @@
 import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
+import { formatMm } from "@/lib/configurator/calculate";
 import type { PartitionType, OpeningOption } from "@/lib/configurator/types";
 
 /**
@@ -156,8 +157,8 @@ export function PartitionProjection({
   const sashPxW = drawW / sashCount;
   // Толщина рамы профиля — пропорциональна, но не меньше 6 / не больше 12
   const frameT = Math.max(6, Math.min(12, drawW * 0.014));
-  // Толщина импоста — чуть тоньше рамы
-  const mullT = Math.max(4, frameT * 0.7);
+  // Толщина импоста — заметно тоньше рамы
+  const mullT = Math.max(2, frameT * 0.4);
 
   const uid = `proj-${modelId}-${profileId}-${glassId}`;
 
@@ -630,7 +631,7 @@ export function PartitionProjection({
                 fill={dimFill}
                 transform={`rotate(-90 ${x0 - 42} ${y0 + drawH / 2})`}
               >
-                {openingHeight}
+                {formatMm(sashHeight)}
               </text>
 
               {/* Ширина (низ) */}
@@ -681,7 +682,7 @@ export function PartitionProjection({
                 fontWeight={500}
                 fill={dimFill}
               >
-                {openingWidth} × {openingHeight} мм
+                {formatMm(sashWidth)} × {formatMm(sashHeight)} мм (створка)
               </text>
             </g>
           );
