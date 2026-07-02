@@ -222,11 +222,11 @@ function ConfiguratorPage() {
               </Field>
               <ReadOnly
                 label="Высота створки"
-                value={`${Math.round(result.sashHeight)} мм`}
+                value={`${formatMm(result.sashHeight)} мм`}
               />
               <ReadOnly
                 label="Ширина створки"
-                value={`${Math.round(result.sashWidth)} мм`}
+                value={`${formatMm(result.sashWidth)} мм`}
               />
               <ReadOnly
                 label={`Кв.м (×${type.sashCount} створ.)`}
@@ -619,8 +619,8 @@ function buildSummaryLines(
     `Тип: ${typeName}`,
     `Высота проёма: ${s.openingHeight} мм`,
     `Ширина проёма: ${s.openingWidth} мм`,
-    `Высота створки: ${Math.round(r.sashHeight)} мм`,
-    `Ширина створки: ${Math.round(r.sashWidth)} мм`,
+    `Высота створки: ${formatMm(r.sashHeight)} мм`,
+    `Ширина створки: ${formatMm(r.sashWidth)} мм`,
     `Площадь: ${r.totalSqm.toFixed(3)} м²`,
     `Стекло: ${glass}`,
     `Профиль: ${profile?.code} (${profile?.name})`,
