@@ -1,46 +1,30 @@
-// Интерьерные рендеры — используются на карточках выбора типа (главная)
-import interior1 from "@/assets/interiors/interior_1.webp.asset.json";
-import interior2 from "@/assets/interiors/interior_2.webp.asset.json";
-import interior3 from "@/assets/interiors/interior_3.webp.asset.json";
-import interior4 from "@/assets/interiors/interior_4.webp.asset.json";
-import interior5 from "@/assets/interiors/interior_5.webp.asset.json";
-import interior6 from "@/assets/interiors/interior_6.webp.asset.json";
-import interior7 from "@/assets/interiors/interior_7.webp.asset.json";
-
-// Технические схемы — используются рядом с проекцией в конфигураторе
-import scheme1 from "@/assets/types/type1.webp.asset.json";
-import scheme2 from "@/assets/types/type2.webp.asset.json";
-import scheme3active from "@/assets/types/type3active.webp.asset.json";
-import scheme3stat from "@/assets/types/type3stat.webp.asset.json";
-import scheme4 from "@/assets/types/type4.webp.asset.json";
-import scheme5 from "@/assets/types/type5.webp.asset.json";
-import scheme6 from "@/assets/types/type6.webp.asset.json";
-import scheme7 from "@/assets/types/type7.webp.asset.json";
+// Локальные ассеты — работают на любом хостинге (Lovable / Timeweb / static)
+// Файлы лежат в public/img/ и раздаются как /img/...
 
 // Карточки выбора типа — интерьерные фото
 export const TYPE_IMAGES: Record<string, string> = {
-  "type-1": interior7.url,
-  "type-2": interior6.url,
-  "type-2-sync": interior6.url,
-  "type-3-active": interior5.url,
-  "type-3-stat": interior5.url,
-  "type-4": interior3.url,
-  "type-5": interior1.url,
-  "type-5-sync": interior1.url,
-  "type-6": interior4.url,
-  "type-7": interior2.url,
+  "type-1": "/img/interiors/interior_7.webp",
+  "type-2": "/img/interiors/interior_6.webp",
+  "type-2-sync": "/img/interiors/interior_6.webp",
+  "type-3-active": "/img/interiors/interior_5.webp",
+  "type-3-stat": "/img/interiors/interior_5.webp",
+  "type-4": "/img/interiors/interior_3.webp",
+  "type-5": "/img/interiors/interior_1.webp",
+  "type-5-sync": "/img/interiors/interior_1.webp",
+  "type-6": "/img/interiors/interior_4.webp",
+  "type-7": "/img/interiors/interior_2.webp",
 };
 
 // Схемы — рядом с проекцией в конфигураторе
 export const TYPE_SCHEMES: Record<string, string> = {
-  "type-1": scheme1.url,
-  "type-2": scheme2.url,
-  "type-2-sync": scheme2.url,
-  "type-3-active": scheme3active.url,
-  "type-3-stat": scheme3stat.url,
-  "type-4": scheme4.url,
-  "type-5": scheme5.url,
-  "type-5-sync": scheme5.url,
-  "type-6": scheme6.url,
-  "type-7": scheme7.url,
+  "type-1": "/img/types/type1.webp",
+  "type-2": "/img/types/type2.webp",
+  "type-2-sync": "/img/types/type2.webp",
+  "type-3-active": "/img/types/type3active.webp",
+  "type-3-stat": "/img/types/type3stat.webp",
+  "type-4": "/img/types/type4.webp",
+  "type-5": "/img/types/type5.webp",
+  "type-5-sync": "/img/types/type5.webp",
+  "type-6": "/img/types/type6.webp",
+  "type-7": "/img/types/type7.webp",
 };
