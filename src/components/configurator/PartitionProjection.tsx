@@ -212,12 +212,6 @@ export function PartitionProjection({
         aria-label="Проекция перегородки"
       >
         <defs>
-          {/* Мягкая заливка интерьера за перегородкой */}
-          <linearGradient id={`${uid}-bg`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f4f5f2" />
-            <stop offset="55%" stopColor="#e9ecea" />
-            <stop offset="100%" stopColor="#dfe3e1" />
-          </linearGradient>
           {/* Градиент металла на профиле (вертикальный — сверху светлее) */}
           <linearGradient id={`${uid}-profGrad`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={prof.light} />
@@ -247,15 +241,28 @@ export function PartitionProjection({
           </clipPath>
         </defs>
 
-        {/* ===== Фон-сцена: мягкая заливка интерьера за перегородкой ===== */}
+        {/* ===== Фон-сцена: интерьер за перегородкой ===== */}
+        {/* Изображение фиксированного "реального" размера, центрируется по
+            проёму. При изменении ширины/высоты проёма клип показывает больше
+            или меньше интерьера — эффект «смотрим через окно нужной ширины». */}
         <g clipPath={`url(#${uid}-clip)`}>
-          <rect
-            x={x0}
-            y={y0}
-            width={drawW}
-            height={drawH}
-            fill={`url(#${uid}-bg)`}
-          />
+          <rect x={x0} y={y0} width={drawW} height={drawH} fill="#eef0ee" />
+          {(() => {
+            const bgW = MAX_W - PAD_L - PAD_R;
+            const bgH = bgW * (1280 / 1920);
+            const bgX = x0 + drawW / 2 - bgW / 2;
+            const bgY = y0 + drawH / 2 - bgH / 2;
+            return (
+              <image
+                href="/img/interior-bg.jpg"
+                x={bgX}
+                y={bgY}
+                width={bgW}
+                height={bgH}
+                preserveAspectRatio="xMidYMid slice"
+              />
+            );
+          })()}
         </g>
 
         {/* ===== Верхняя направляющая (рельс) — тонкая линия над рамой ===== */}
