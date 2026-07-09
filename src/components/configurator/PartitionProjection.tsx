@@ -2,6 +2,7 @@ import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
 import { formatMm } from "@/lib/configurator/calculate";
 import type { PartitionType, OpeningOption } from "@/lib/configurator/types";
+import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
 
 /**
  * Раскладка импостов (внутренних перемычек) для каждой модели ALP.
@@ -202,12 +203,14 @@ export function PartitionProjection({
     );
   };
 
+  const interiorUrl = TYPE_IMAGES[type.id];
+
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full">
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        className="w-full max-w-full"
-        style={{ height: "auto" }}
+        className="w-full h-full"
+        preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label="Проекция перегородки"
       >
@@ -230,12 +233,6 @@ export function PartitionProjection({
             <stop offset="0%" stopColor="white" stopOpacity="0.18" />
             <stop offset="35%" stopColor="white" stopOpacity="0" />
           </linearGradient>
-          {/* Мягкий «фон комнаты» за стеклом — лёгкий вертикальный градиент */}
-          <linearGradient id={`${uid}-roomBg`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f3f5f7" />
-            <stop offset="55%" stopColor="#e6eaee" />
-            <stop offset="100%" stopColor="#d4d9de" />
-          </linearGradient>
           {/* Тень от перегородки */}
           <radialGradient id={`${uid}-shadow`} cx="0.5" cy="0" r="0.6">
             <stop offset="0%" stopColor="black" stopOpacity="0.45" />
@@ -247,15 +244,20 @@ export function PartitionProjection({
           </clipPath>
         </defs>
 
-        {/* ===== Фон-сцена: нейтральный фон комнаты ===== */}
+        {/* ===== Фон-сцена: интерьерное фото за перегородкой ===== */}
         <g clipPath={`url(#${uid}-clip)`}>
-          <rect
-            x={x0}
-            y={y0}
-            width={drawW}
-            height={drawH}
-            fill={`url(#${uid}-roomBg)`}
-          />
+          {interiorUrl ? (
+            <image
+              href={interiorUrl}
+              x={x0}
+              y={y0}
+              width={drawW}
+              height={drawH}
+              preserveAspectRatio="xMidYMid slice"
+            />
+          ) : (
+            <rect x={x0} y={y0} width={drawW} height={drawH} fill="#e6eaee" />
+          )}
         </g>
 
         {/* ===== Верхняя направляющая (рельс) — тонкая линия над рамой ===== */}

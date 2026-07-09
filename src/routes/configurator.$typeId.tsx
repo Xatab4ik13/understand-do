@@ -349,7 +349,10 @@ function ConfiguratorPage() {
               <CardTitle className="text-base">Проекция</CardTitle>
             </CardHeader>
             <CardContent>
-              <div ref={projectionWrapRef}>
+              <div
+                ref={projectionWrapRef}
+                className="w-full aspect-[4/3] overflow-hidden"
+              >
                 <PartitionProjection
                   type={type}
                   openingHeight={s.openingHeight}
@@ -654,12 +657,7 @@ function buildSummaryLines(
       return `  ${i + 1}. ${SETS[id]?.name ?? id} — открывание: ${s.openings[i]}${posStr}`;
     }),
     ``,
-    `Цена: ${formatRub(r.totalPrice)}`,
-    r.isNonStandard
-      ? `Наценка нестандарт (+30%): ${formatRub(r.nonStandardMarkup)}`
-      : "",
-    `Цена общая: ${formatRub(r.totalWithMarkup)}`,
-    `Цена РРЦ (+70%): ${formatRub(r.rrcPrice)}`,
+    `Цена: ${formatRub(r.rrcPrice)}`,
   ];
   return lines.filter((l) => l !== null && l !== undefined) as string[];
 }
