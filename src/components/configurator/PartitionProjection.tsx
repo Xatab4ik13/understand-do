@@ -2,7 +2,6 @@ import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
 import { formatMm } from "@/lib/configurator/calculate";
 import type { PartitionType, OpeningOption } from "@/lib/configurator/types";
-import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
 
 /**
  * Раскладка импостов (внутренних перемычек) для каждой модели ALP.
@@ -203,8 +202,6 @@ export function PartitionProjection({
     );
   };
 
-  const interiorUrl = TYPE_IMAGES[type.id];
-
   return (
     <div className="w-full">
       <svg
@@ -215,6 +212,12 @@ export function PartitionProjection({
         aria-label="Проекция перегородки"
       >
         <defs>
+          {/* Мягкая заливка интерьера за перегородкой */}
+          <linearGradient id={`${uid}-bg`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f4f5f2" />
+            <stop offset="55%" stopColor="#e9ecea" />
+            <stop offset="100%" stopColor="#dfe3e1" />
+          </linearGradient>
           {/* Градиент металла на профиле (вертикальный — сверху светлее) */}
           <linearGradient id={`${uid}-profGrad`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={prof.light} />
@@ -244,20 +247,15 @@ export function PartitionProjection({
           </clipPath>
         </defs>
 
-        {/* ===== Фон-сцена: интерьерное фото за перегородкой ===== */}
+        {/* ===== Фон-сцена: мягкая заливка интерьера за перегородкой ===== */}
         <g clipPath={`url(#${uid}-clip)`}>
-          {interiorUrl ? (
-            <image
-              href={interiorUrl}
-              x={x0}
-              y={y0}
-              width={drawW}
-              height={drawH}
-              preserveAspectRatio="xMidYMid slice"
-            />
-          ) : (
-            <rect x={x0} y={y0} width={drawW} height={drawH} fill="#e6eaee" />
-          )}
+          <rect
+            x={x0}
+            y={y0}
+            width={drawW}
+            height={drawH}
+            fill={`url(#${uid}-bg)`}
+          />
         </g>
 
         {/* ===== Верхняя направляющая (рельс) — тонкая линия над рамой ===== */}
