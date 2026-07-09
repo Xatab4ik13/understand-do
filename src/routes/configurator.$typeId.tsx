@@ -657,9 +657,6 @@ function buildSummaryLines(
       return `  ${i + 1}. ${SETS[id]?.name ?? id} — открывание: ${s.openings[i]}${posStr}`;
     }),
     ``,
-    `Цена: ${formatRub(r.totalPrice)}`,
-    r.isNonStandard
-      ? `Наценка нестандарт (+30%): ${formatRub(r.nonStandardMarkup)}`
     `Цена: ${formatRub(r.rrcPrice)}`,
   ];
   return lines.filter((l) => l !== null && l !== undefined) as string[];
