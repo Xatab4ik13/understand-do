@@ -349,10 +349,7 @@ function ConfiguratorPage() {
               <CardTitle className="text-base">Проекция</CardTitle>
             </CardHeader>
             <CardContent>
-              <div
-                ref={projectionWrapRef}
-                className="w-full aspect-[4/3] overflow-hidden"
-              >
+              <div ref={projectionWrapRef} className="w-full">
                 <PartitionProjection
                   type={type}
                   openingHeight={s.openingHeight}
