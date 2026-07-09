@@ -2,7 +2,6 @@ import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
 import { formatMm } from "@/lib/configurator/calculate";
 import type { PartitionType, OpeningOption } from "@/lib/configurator/types";
-import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
 
 /**
  * Раскладка импостов (внутренних перемычек) для каждой модели ALP.
