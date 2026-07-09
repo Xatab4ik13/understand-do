@@ -242,27 +242,17 @@ export function PartitionProjection({
         </defs>
 
         {/* ===== Фон-сцена: интерьер за перегородкой ===== */}
-        {/* Изображение фиксированного "реального" размера, центрируется по
-            проёму. При изменении ширины/высоты проёма клип показывает больше
-            или меньше интерьера — эффект «смотрим через окно нужной ширины». */}
+        {/* Изображение заполняет видимую область стекла (cover). */}
         <g clipPath={`url(#${uid}-clip)`}>
           <rect x={x0} y={y0} width={drawW} height={drawH} fill="#eef0ee" />
-          {(() => {
-            const bgW = MAX_W - PAD_L - PAD_R;
-            const bgH = bgW * (1280 / 1920);
-            const bgX = x0 + drawW / 2 - bgW / 2;
-            const bgY = y0 + drawH / 2 - bgH / 2;
-            return (
-              <image
-                href="/img/interior-bg.jpg"
-                x={bgX}
-                y={bgY}
-                width={bgW}
-                height={bgH}
-                preserveAspectRatio="xMidYMid slice"
-              />
-            );
-          })()}
+          <image
+            href="/img/interior-bg.jpg"
+            x={x0}
+            y={y0}
+            width={drawW}
+            height={drawH}
+            preserveAspectRatio="xMidYMid slice"
+          />
         </g>
 
         {/* ===== Верхняя направляющая (рельс) — тонкая линия над рамой ===== */}
