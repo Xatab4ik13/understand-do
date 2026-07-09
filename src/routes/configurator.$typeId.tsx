@@ -660,9 +660,7 @@ function buildSummaryLines(
     `Цена: ${formatRub(r.totalPrice)}`,
     r.isNonStandard
       ? `Наценка нестандарт (+30%): ${formatRub(r.nonStandardMarkup)}`
-      : "",
-    `Цена общая: ${formatRub(r.totalWithMarkup)}`,
-    `Цена РРЦ (+70%): ${formatRub(r.rrcPrice)}`,
+    `Цена: ${formatRub(r.rrcPrice)}`,
   ];
   return lines.filter((l) => l !== null && l !== undefined) as string[];
 }
