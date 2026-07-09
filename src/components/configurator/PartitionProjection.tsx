@@ -247,20 +247,15 @@ export function PartitionProjection({
           </clipPath>
         </defs>
 
-        {/* ===== Фон-сцена: интерьерное фото за перегородкой ===== */}
+        {/* ===== Фон-сцена: мягкая заливка интерьера за перегородкой ===== */}
         <g clipPath={`url(#${uid}-clip)`}>
-          {interiorUrl ? (
-            <image
-              href={interiorUrl}
-              x={x0}
-              y={y0}
-              width={drawW}
-              height={drawH}
-              preserveAspectRatio="xMidYMid slice"
-            />
-          ) : (
-            <rect x={x0} y={y0} width={drawW} height={drawH} fill="#e6eaee" />
-          )}
+          <rect
+            x={x0}
+            y={y0}
+            width={drawW}
+            height={drawH}
+            fill={`url(#${uid}-bg)`}
+          />
         </g>
 
         {/* ===== Верхняя направляющая (рельс) — тонкая линия над рамой ===== */}
