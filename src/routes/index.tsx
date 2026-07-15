@@ -21,11 +21,11 @@ function Index() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-6 md:flex-row md:items-center">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-3 md:flex-row md:items-center">
           <img
             src={logoUrl}
             alt="Логотип BRANDOORS Brand Alum"
-            className="h-28 w-auto md:h-36"
+            className="h-32 w-auto md:h-44"
           />
           <p className="text-base text-muted-foreground md:text-right md:text-lg">
             Выберите тип конструкции, чтобы рассчитать стоимость
