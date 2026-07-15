@@ -588,8 +588,20 @@ function ConfiguratorPage() {
           <Button onClick={onDownloadPdf} className="w-full">
             <Download className="mr-2 h-4 w-4" /> Скачать PDF
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => setContactOpen(true)}
+            className="w-full"
+          >
+            <Mail className="mr-2 h-4 w-4" /> Оставить заявку
+          </Button>
         </aside>
       </main>
+      <ContactRequestDialog
+        open={contactOpen}
+        onOpenChange={setContactOpen}
+        summary={summaryLines.join("\n")}
+      />
     </div>
   );
 }
