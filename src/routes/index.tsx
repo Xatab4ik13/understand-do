@@ -3,7 +3,7 @@ import { PARTITION_TYPES } from "@/lib/configurator/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatRub } from "@/lib/configurator/calculate";
 import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
-import logoAsset from "@/assets/logo.svg.asset.json";
+import logoAsset from "@/assets/logo-icon.png.asset.json";
 
 const logoUrl = logoAsset.url;
 
