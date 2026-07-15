@@ -175,7 +175,7 @@ function ConfiguratorPage() {
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
           <img
             src={logoUrl}
-            alt="Логотип"
+            alt="Логотип BRANDOORS Brand Alum"
             className="h-16 w-auto md:h-20"
           />
           <div className="min-w-0 flex-1">
