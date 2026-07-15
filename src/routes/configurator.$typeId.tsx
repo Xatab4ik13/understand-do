@@ -22,12 +22,14 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { PartitionProjection } from "@/components/configurator/PartitionProjection";
 import { exportOrderToPdf } from "@/lib/configurator/exportPdf";
-import logoUrl from "@/assets/logo.svg?url";
+import logoAsset from "@/assets/logo.svg.asset.json";
 import { TYPE_SCHEMES } from "@/lib/configurator/typeImages";
+
+const logoUrl = logoAsset.url;
 
 export const Route = createFileRoute("/configurator/$typeId")({
   head: ({ params }) => ({
-    meta: [{ title: `Конфигуратор — ${params.typeId}` }],
+    meta: [{ title: `BRANDOORS Brand Alum — ${params.typeId}` }],
   }),
   component: ConfiguratorPage,
   notFoundComponent: () => (
@@ -175,7 +177,7 @@ function ConfiguratorPage() {
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
           <img
             src={logoUrl}
-            alt="Логотип"
+            alt="Логотип BRANDOORS Brand Alum"
             className="h-16 w-auto md:h-20"
           />
           <div className="min-w-0 flex-1">
