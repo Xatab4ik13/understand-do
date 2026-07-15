@@ -8,13 +8,10 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   tanstackStart: {
-    spa: {
-      enabled: true,
-      prerender: { outputPath: "/index" },
-    },
     server: { entry: "server" },
   },
-  // Disable Nitro entirely — we only need the static client bundle for
-  // Timeweb App Platform "React" (static hosting).
-  nitro: false,
+  // Deploy as a Node.js server on VPS (nginx → node → :3000).
+  nitro: {
+    preset: "node-server",
+  },
 });
