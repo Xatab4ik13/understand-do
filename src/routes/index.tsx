@@ -8,8 +8,8 @@ import logoUrl from "@/assets/logo.svg?url";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Конфигуратор перегородок" },
-      { name: "description", content: "Онлайн-расчёт стоимости стеклянных перегородок" },
+      { title: "BRANDOORS Brand Alum" },
+      { name: "description", content: "Онлайн-расчёт стоимости алюминиевых стеклянных перегородок BRANDOORS" },
     ],
   }),
   component: Index,
@@ -22,11 +22,11 @@ function Index() {
         <div className="mx-auto max-w-6xl px-6 py-6">
           <img
             src={logoUrl}
-            alt="Логотип"
+            alt="Логотип BRANDOORS Brand Alum"
             className="h-20 w-auto md:h-24"
           />
           <h1 className="mt-6 text-2xl font-semibold tracking-tight">
-            Конфигуратор перегородок
+            BRANDOORS Brand Alum
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Выберите тип конструкции, чтобы рассчитать стоимость

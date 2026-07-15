@@ -27,7 +27,7 @@ import { TYPE_SCHEMES } from "@/lib/configurator/typeImages";
 
 export const Route = createFileRoute("/configurator/$typeId")({
   head: ({ params }) => ({
-    meta: [{ title: `Конфигуратор — ${params.typeId}` }],
+    meta: [{ title: `BRANDOORS Brand Alum — ${params.typeId}` }],
   }),
   component: ConfiguratorPage,
   notFoundComponent: () => (
