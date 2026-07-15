@@ -22,15 +22,25 @@ function Index() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-2 md:flex-row md:items-center">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <img
               src={logoUrl}
               alt="Логотип Brand Alum"
-              className="h-24 w-auto md:h-32"
+              className="h-20 w-auto md:h-28"
             />
-            <div className="flex flex-col leading-tight">
-              <span className="text-2xl font-bold tracking-wide md:text-3xl">Brand Alum</span>
-              <span className="mt-1 text-xs text-muted-foreground md:text-sm">Алюминиевые стеклянные перегородки</span>
+            <div className="flex flex-col">
+              <div className="inline-flex flex-col">
+                <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
+                  Brand
+                </span>
+                <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
+                  Alum
+                </span>
+                <div className="mt-1 h-[2px] w-full bg-foreground" />
+              </div>
+              <span className="mt-1 font-['Times_New_Roman',Times,Georgia,serif] text-sm italic leading-tight text-foreground md:text-base">
+                Алюминиевые стеклянные перегородки
+              </span>
             </div>
           </div>
           <p className="text-base text-muted-foreground md:text-right md:text-lg">
