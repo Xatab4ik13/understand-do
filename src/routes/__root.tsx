@@ -80,25 +80,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "BRANDOORS Brand Alum" },
+      { title: "Brand Alum" },
       {
         name: "description",
         content:
-          "Онлайн-конфигуратор алюминиевых стеклянных перегородок BRANDOORS: подбор типа, стекла, профиля и фурнитуры с мгновенным расчётом стоимости.",
+          "Онлайн-конфигуратор алюминиевых стеклянных перегородок Brand Alum: подбор типа, стекла, профиля и фурнитуры с мгновенным расчётом стоимости.",
       },
-      { property: "og:title", content: "BRANDOORS Brand Alum" },
+      { property: "og:title", content: "Brand Alum" },
       {
         property: "og:description",
         content:
-          "Онлайн-конфигуратор алюминиевых стеклянных перегородок BRANDOORS: подбор типа, стекла, профиля и фурнитуры с мгновенным расчётом стоимости.",
+          "Онлайн-конфигуратор алюминиевых стеклянных перегородок Brand Alum: подбор типа, стекла, профиля и фурнитуры с мгновенным расчётом стоимости.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "BRANDOORS Brand Alum" },
+      { name: "twitter:title", content: "Brand Alum" },
       {
         name: "twitter:description",
         content:
-          "Онлайн-конфигуратор алюминиевых стеклянных перегородок BRANDOORS: подбор типа, стекла, профиля и фурнитуры с мгновенным расчётом стоимости.",
+          "Онлайн-конфигуратор алюминиевых стеклянных перегородок Brand Alum: подбор типа, стекла, профиля и фурнитуры с мгновенным расчётом стоимости.",
       },
     ],
     links: [

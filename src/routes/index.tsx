@@ -10,8 +10,8 @@ const logoUrl = logoAsset.url;
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "BRANDOORS Brand Alum" },
-      { name: "description", content: "Онлайн-расчёт стоимости алюминиевых стеклянных перегородок BRANDOORS" },
+      { title: "Brand Alum" },
+      { name: "description", content: "Онлайн-расчёт стоимости алюминиевых стеклянных перегородок Brand Alum" },
     ],
   }),
   component: Index,
@@ -25,12 +25,11 @@ function Index() {
           <div className="flex items-center gap-4">
             <img
               src={logoUrl}
-              alt="Логотип BRANDOORS Brand Alum"
+              alt="Логотип Brand Alum"
               className="h-24 w-auto md:h-32"
             />
             <div className="flex flex-col leading-tight">
-              <span className="text-2xl font-bold tracking-wide md:text-3xl">BRANDOORS</span>
-              <span className="text-lg font-medium tracking-widest text-muted-foreground md:text-xl">BRAND ALUM</span>
+              <span className="text-2xl font-bold tracking-wide md:text-3xl">Brand Alum</span>
               <span className="mt-1 text-xs text-muted-foreground md:text-sm">Алюминиевые стеклянные перегородки</span>
             </div>
           </div>
