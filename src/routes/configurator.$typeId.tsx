@@ -509,36 +509,51 @@ function ConfiguratorPage() {
               <CardTitle className="text-base">Расчёт</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <Row label="Базовая цена" value={formatRub(type.basePrice)} />
+              <Row label="Базовая цена" value={formatPrice(type.basePrice, isDealer)} />
               <Row
                 label={`Стекло × ${result.totalSqm.toFixed(2)} м²`}
-                value={formatRub(result.glassPrice * result.totalSqm)}
+                value={formatPrice(result.glassPrice * result.totalSqm, isDealer)}
               />
               <Row
                 label={`Модель × ${type.sashCount}`}
-                value={formatRub(result.modelsPrice)}
+                value={formatPrice(result.modelsPrice, isDealer)}
               />
-              <Row label="Системы" value={formatRub(result.setsPrice)} />
-              <Row label="Ручки" value={formatRub(result.handlesPrice)} />
+              <Row label="Системы" value={formatPrice(result.setsPrice, isDealer)} />
+              <Row label="Ручки" value={formatPrice(result.handlesPrice, isDealer)} />
               <div className="my-2 border-t" />
-              <Row label="Цена" value={formatRub(result.totalPrice)} bold />
-              {result.isNonStandard && (
-                <Row
-                  label="Наценка нестандарт +30%"
-                  value={formatRub(result.nonStandardMarkup)}
-                />
+              {isDealer ? (
+                <>
+                  <Row label="Цена" value={formatRub(result.totalPrice)} bold />
+                  {result.isNonStandard && (
+                    <Row
+                      label="Наценка нестандарт +30%"
+                      value={formatRub(result.nonStandardMarkup)}
+                    />
+                  )}
+                  <Row
+                    label="Цена общая"
+                    value={formatRub(result.totalWithMarkup)}
+                    bold
+                  />
+                  <div className="my-2 border-t" />
+                  <Row
+                    label="Цена РРЦ (+70%)"
+                    value={formatRub(result.rrcPrice)}
+                    accent
+                  />
+                </>
+              ) : (
+                <>
+                  {result.isNonStandard && (
+                    <Row
+                      label="Наценка нестандарт"
+                      value={formatPrice(result.nonStandardMarkup, isDealer)}
+                    />
+                  )}
+                  <Row label="Цена" value={formatRub(result.rrcPrice)} accent />
+                </>
               )}
-              <Row
-                label="Цена общая"
-                value={formatRub(result.totalWithMarkup)}
-                bold
-              />
-              <div className="my-2 border-t" />
-              <Row
-                label="Цена РРЦ (+70%)"
-                value={formatRub(result.rrcPrice)}
-                accent
-              />
+
 
               {result.warnings.length > 0 && (
                 <div className="mt-3 space-y-1">
