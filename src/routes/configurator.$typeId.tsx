@@ -601,8 +601,8 @@ function ConfiguratorPage() {
       <ContactRequestDialog
         open={contactOpen}
         onOpenChange={setContactOpen}
-        summary={summaryLines.join("\n")}
       />
+
     </div>
   );
 }
