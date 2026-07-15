@@ -21,12 +21,12 @@ function Index() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-2 md:flex-row md:items-center">
-          <div className="flex items-center gap-2">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
+          <div className="flex items-stretch gap-2">
             <img
               src={logoUrl}
               alt="Логотип Brand Alum"
-              className="h-20 w-auto md:h-28"
+              className="h-24 w-auto md:h-full"
             />
             <div className="flex flex-col">
               <div className="inline-flex flex-col">
