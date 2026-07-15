@@ -116,11 +116,6 @@ export function ContactRequestDialog({
               disabled={loading}
             />
           </div>
-          {summary && (
-            <p className="text-xs text-muted-foreground">
-              К заявке будет приложена текущая конфигурация из конфигуратора.
-            </p>
-          )}
           <DialogFooter>
             <Button type="submit" disabled={loading}>
               {loading ? "Отправляем…" : "Отправить"}
