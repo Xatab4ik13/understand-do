@@ -72,14 +72,9 @@ function Index() {
           <div className="flex flex-col items-center gap-2 md:items-end">
             <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 md:justify-end">
               {isDealer ? (
-                <>
-                  <span className="rounded-md bg-primary/10 px-2 py-0.5 font-['Inter'] text-xs font-black uppercase tracking-tight text-primary md:text-sm">
-                    Режим дилера
-                  </span>
-                  <button type="button" className={menuItemClass} onClick={onLogout}>
-                    Выйти
-                  </button>
-                </>
+                <button type="button" className={menuItemClass} onClick={onLogout}>
+                  Выйти
+                </button>
               ) : (
                 <button type="button" className={menuItemClass} onClick={() => setModal("dealer-login")}>
                   Для дилеров
