@@ -4,15 +4,9 @@ import { PARTITION_TYPES } from "@/lib/configurator/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatPrice } from "@/lib/configurator/calculate";
 import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { DealerLoginDialog } from "@/components/DealerLoginDialog";
-import { Button } from "@/components/ui/button";
+import { DealerRequestDialog } from "@/components/DealerRequestDialog";
+
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { useDealerMode, useInvalidateDealerMode } from "@/hooks/useDealerMode";
@@ -158,17 +152,10 @@ function Index() {
         onOpenChange={(o) => setModal(o ? "dealer-login" : null)}
       />
 
-      <Dialog open={modal === "dealer-request"} onOpenChange={(o) => setModal(o ? "dealer-request" : null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Заявка на дилерство</DialogTitle>
-            <DialogDescription>Форма появится в следующей итерации.</DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={() => setModal(null)}>Закрыть</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <DealerRequestDialog
+        open={modal === "dealer-request"}
+        onOpenChange={(o) => setModal(o ? "dealer-request" : null)}
+      />
     </div>
   );
 }
