@@ -4,14 +4,8 @@ import { PARTITION_TYPES } from "@/lib/configurator/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatPrice } from "@/lib/configurator/calculate";
 import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { DealerLoginDialog } from "@/components/DealerLoginDialog";
+import { DealerRequestDialog } from "@/components/DealerRequestDialog";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
