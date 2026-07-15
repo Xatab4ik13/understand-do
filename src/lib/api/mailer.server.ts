@@ -19,8 +19,14 @@ export function getTransporter(): nodemailer.Transporter {
     port,
     secure: port === 465,
     auth: { user, pass },
+    connectionTimeout: 15_000,
+    greetingTimeout: 15_000,
+    socketTimeout: 20_000,
+    logger: true,
+    debug: true,
   });
   return cached;
+
 }
 
 export function getFrom(): string {
