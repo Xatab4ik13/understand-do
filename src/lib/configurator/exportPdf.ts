@@ -323,7 +323,7 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   ctx.font = `14px ${FONT}`;
   ctx.textAlign = "center";
   ctx.fillText(
-    "Сформировано в конфигураторе перегородок BRANDOORS",
+    "Сформировано в конфигураторе перегородок Brand Alum",
     pageW / 2,
     pageH - margin + 12,
   );
