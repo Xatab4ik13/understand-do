@@ -193,8 +193,32 @@ function ConfiguratorPage() {
             </Link>
             <h1 className="mt-1 truncate text-xl font-semibold">{type.name}</h1>
           </div>
+          {isDealer && (
+            <div className="flex items-center gap-2">
+              <span className="rounded-md bg-primary/10 px-2 py-0.5 font-['Inter'] text-xs font-black uppercase tracking-tight text-primary">
+                Режим дилера
+              </span>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await dealerLogout();
+                    await invalidateDealer();
+                    toast.success("Дилерский режим выключен");
+                  } catch (e) {
+                    console.error(e);
+                    toast.error("Не удалось выйти");
+                  }
+                }}
+                className="font-['Inter'] text-xs font-black uppercase tracking-tight text-foreground transition-opacity hover:opacity-70"
+              >
+                Выйти
+              </button>
+            </div>
+          )}
         </div>
       </header>
+
 
       <main className="mx-auto grid max-w-6xl gap-6 px-6 py-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
