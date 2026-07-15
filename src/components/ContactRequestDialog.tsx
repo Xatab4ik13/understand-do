@@ -16,11 +16,9 @@ import { toast } from "sonner";
 export function ContactRequestDialog({
   open,
   onOpenChange,
-  summary,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
-  summary?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -38,7 +36,7 @@ export function ContactRequestDialog({
     e.preventDefault();
     setLoading(true);
     try {
-      await submitContactRequest({ data: { ...form, summary: summary ?? "" } });
+      await submitContactRequest({ data: { ...form } });
       toast.success("Заявка отправлена. Мы свяжемся с вами.");
       reset();
       onOpenChange(false);
@@ -50,6 +48,7 @@ export function ContactRequestDialog({
       setLoading(false);
     }
   };
+
 
   return (
     <Dialog
