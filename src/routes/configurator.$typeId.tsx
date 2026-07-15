@@ -67,6 +67,8 @@ function allowedSetsFor(
 function ConfiguratorPage() {
   const { typeId } = Route.useLoaderData() as { typeId: string };
   const type = getPartitionType(typeId)!;
+  const isDealer = useDealerMode();
+  const invalidateDealer = useInvalidateDealerMode();
 
   const [s, setS] = useState<Selections>(() => ({
     openingHeight: 0,
