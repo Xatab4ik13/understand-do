@@ -38,7 +38,7 @@ function Index() {
                 </span>
                 <div className="mt-1 h-[2px] w-full bg-foreground" />
               </div>
-              <span className="mt-1 font-['Times_New_Roman',Times,Georgia,serif] text-sm italic leading-tight text-foreground md:text-base">
+              <span className="mt-1 font-sans text-sm font-medium leading-tight text-foreground md:text-base">
                 Алюминиевые стеклянные перегородки
               </span>
             </div>
