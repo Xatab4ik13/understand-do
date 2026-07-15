@@ -1,5 +1,7 @@
 import { jsPDF } from "jspdf";
-import logoUrl from "@/assets/logo.svg?url";
+import logoAsset from "@/assets/logo.svg.asset.json";
+
+const logoUrl = logoAsset.url;
 
 function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {

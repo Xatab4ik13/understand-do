@@ -10,8 +10,10 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import logoUrl from "../assets/logo.svg?url";
+import logoAsset from "../assets/logo.svg.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+
+const logoUrl = logoAsset.url;
 
 function NotFoundComponent() {
   return (

@@ -22,8 +22,10 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { PartitionProjection } from "@/components/configurator/PartitionProjection";
 import { exportOrderToPdf } from "@/lib/configurator/exportPdf";
-import logoUrl from "@/assets/logo.svg?url";
+import logoAsset from "@/assets/logo.svg.asset.json";
 import { TYPE_SCHEMES } from "@/lib/configurator/typeImages";
+
+const logoUrl = logoAsset.url;
 
 export const Route = createFileRoute("/configurator/$typeId")({
   head: ({ params }) => ({

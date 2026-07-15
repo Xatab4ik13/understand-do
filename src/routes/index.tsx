@@ -3,7 +3,9 @@ import { PARTITION_TYPES } from "@/lib/configurator/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatRub } from "@/lib/configurator/calculate";
 import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
-import logoUrl from "@/assets/logo.svg?url";
+import logoAsset from "@/assets/logo.svg.asset.json";
+
+const logoUrl = logoAsset.url;
 
 export const Route = createFileRoute("/")({
   head: () => ({
