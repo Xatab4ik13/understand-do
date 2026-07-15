@@ -22,7 +22,7 @@ function Index() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-2 md:flex-row md:items-center">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <img
               src={logoUrl}
               alt="Логотип Brand Alum"
@@ -35,7 +35,7 @@ function Index() {
               <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
                 Alum
               </span>
-              <div className="mt-1 h-[3px] w-full bg-foreground" />
+              <div className="mt-1 h-[2px] w-full bg-foreground" />
               <span className="mt-1 font-['Times_New_Roman',Times,Georgia,serif] text-sm italic leading-tight text-foreground md:text-base">
                 Алюминиевые стеклянные перегородки
               </span>
