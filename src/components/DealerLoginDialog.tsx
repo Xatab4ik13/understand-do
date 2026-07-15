@@ -52,7 +52,7 @@ export function DealerLoginDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Вход для дилеров</DialogTitle>
-          <DialogDescription>Введите пароль дилера, чтобы увидеть дилерские цены.</DialogDescription>
+          
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           <div className="space-y-2">
