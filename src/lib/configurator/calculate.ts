@@ -141,6 +141,11 @@ export function formatRub(n: number): string {
   }).format(Math.round(n));
 }
 
+/** Формат цены с учётом режима: розница = дилерская × (1 + RRC_MARKUP). */
+export function formatPrice(dealerPrice: number, isDealer: boolean): string {
+  return formatRub(isDealer ? dealerPrice : dealerPrice * (1 + RRC_MARKUP));
+}
+
 /** Форматирование размера в мм без округления (до 1 знака после запятой) */
 export function formatMm(n: number): string {
   if (!isFinite(n)) return "—";
