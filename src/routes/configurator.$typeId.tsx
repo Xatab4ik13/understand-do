@@ -283,7 +283,7 @@ function ConfiguratorPage() {
                   <SelectContent>
                     {GLASSES.map((g) => (
                       <SelectItem key={g.id} value={g.id}>
-                        {g.name} — {formatRub(g.pricePerSqm)}/м²
+                        {g.name} — {formatPrice(g.pricePerSqm, isDealer)}/м²
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -348,7 +348,7 @@ function ConfiguratorPage() {
                             {m.code}
                           </div>
                           <div className="mt-0.5 text-[11px] text-muted-foreground">
-                            {m.price > 0 ? `+${formatRub(m.price)}` : "базовая"}
+                            {m.price > 0 ? `+${formatPrice(m.price, isDealer)}` : "базовая"}
                           </div>
                         </div>
                       </button>
@@ -370,14 +370,14 @@ function ConfiguratorPage() {
                         : s.handleCount < 5
                           ? "ручки"
                           : "ручек"}{" "}
-                      — {formatRub(HANDLE_COUNT_PRICES[s.handleCount] ?? 0)}
+                      — {formatPrice(HANDLE_COUNT_PRICES[s.handleCount] ?? 0, isDealer)}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {handleCountOptions.map((n) => (
                       <SelectItem key={n} value={String(n)}>
                         {n} {n === 1 ? "ручка" : n < 5 ? "ручки" : "ручек"} —{" "}
-                        {formatRub(HANDLE_COUNT_PRICES[n] ?? 0)}
+                        {formatPrice(HANDLE_COUNT_PRICES[n] ?? 0, isDealer)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -450,7 +450,7 @@ function ConfiguratorPage() {
                           <SelectValue>
                             {(() => {
                               const set = SETS[s.setIds[idx]];
-                              return set ? `${set.name} — ${formatRub(set.price)}` : "—";
+                              return set ? `${set.name} — ${formatPrice(set.price, isDealer)}` : "—";
                             })()}
                           </SelectValue>
                         </SelectTrigger>
@@ -459,7 +459,7 @@ function ConfiguratorPage() {
                             const set = SETS[setId];
                             return (
                               <SelectItem key={setId} value={setId}>
-                                {set.name} — {formatRub(set.price)}
+                                {set.name} — {formatPrice(set.price, isDealer)}
                               </SelectItem>
                             );
                           })}
