@@ -82,6 +82,7 @@ function ConfiguratorPage() {
     handleCount: Math.min(type.sashCount, type.maxHandleCount) || 1,
     handlePositions: type.sashes.map(() => []),
   }));
+  const [contactOpen, setContactOpen] = useState(false);
 
   const result = useMemo(() => calculate(type, s), [type, s]);
   const sashWidth = result.sashWidth;
