@@ -19,11 +19,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, AlertTriangle, Download } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Download, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { PartitionProjection } from "@/components/configurator/PartitionProjection";
 import { exportOrderToPdf } from "@/lib/configurator/exportPdf";
+import { ContactRequestDialog } from "@/components/ContactRequestDialog";
 import logoAsset from "@/assets/logo-icon.png.asset.json";
 import { TYPE_SCHEMES } from "@/lib/configurator/typeImages";
 
