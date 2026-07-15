@@ -289,30 +289,42 @@ function ConfiguratorPage() {
             <CardHeader>
               <CardTitle className="text-base">Комплектация</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-4 sm:grid-cols-2">
+            <CardContent className="grid gap-4">
               <Field label="Модель перегородки">
-                <Select
-                  value={s.modelId}
-                  onValueChange={(v) => setS({ ...s, modelId: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue>
-                      {(() => {
-                        const m = PARTITION_MODELS.find((m) => m.id === s.modelId);
-                        return m
-                          ? `${m.code}${m.price > 0 ? ` (+${formatRub(m.price)})` : " (базовая)"}`
-                          : "—";
-                      })()}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PARTITION_MODELS.map((m) => (
-                      <SelectItem key={m.id} value={m.id}>
-                        {m.code} {m.price > 0 ? `(+${formatRub(m.price)})` : "(базовая)"}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
+                  {PARTITION_MODELS.map((m) => {
+                    const selected = s.modelId === m.id;
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setS({ ...s, modelId: m.id })}
+                        className={`group flex flex-col overflow-hidden rounded-md border bg-background text-left transition-all hover:border-primary ${
+                          selected
+                            ? "border-primary ring-2 ring-primary"
+                            : "border-border"
+                        }`}
+                      >
+                        <div className="aspect-square overflow-hidden bg-muted/30">
+                          <img
+                            src={m.image}
+                            alt={m.code}
+                            loading="lazy"
+                            className="h-full w-full object-contain p-1"
+                          />
+                        </div>
+                        <div className="border-t px-2 py-1.5">
+                          <div className="text-xs font-medium leading-tight">
+                            {m.code}
+                          </div>
+                          <div className="mt-0.5 text-[11px] text-muted-foreground">
+                            {m.price > 0 ? `+${formatRub(m.price)}` : "базовая"}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </Field>
 
               <Field label="Количество ручек">
