@@ -3,7 +3,7 @@ import { PARTITION_TYPES } from "@/lib/configurator/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatRub } from "@/lib/configurator/calculate";
 import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
-import logoAsset from "@/assets/logo.svg.asset.json";
+import logoAsset from "@/assets/logo-icon.png.asset.json";
 
 const logoUrl = logoAsset.url;
 
@@ -21,12 +21,19 @@ function Index() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-1 md:flex-row md:items-center">
-          <img
-            src={logoUrl}
-            alt="Логотип BRANDOORS Brand Alum"
-            className="h-36 w-auto md:h-44"
-          />
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-2 md:flex-row md:items-center">
+          <div className="flex items-center gap-4">
+            <img
+              src={logoUrl}
+              alt="Логотип BRANDOORS Brand Alum"
+              className="h-24 w-auto md:h-32"
+            />
+            <div className="flex flex-col leading-tight">
+              <span className="text-2xl font-bold tracking-wide md:text-3xl">BRANDOORS</span>
+              <span className="text-lg font-medium tracking-widest text-muted-foreground md:text-xl">BRAND ALUM</span>
+              <span className="mt-1 text-xs text-muted-foreground md:text-sm">Алюминиевые стеклянные перегородки</span>
+            </div>
+          </div>
           <p className="text-base text-muted-foreground md:text-right md:text-lg">
             Выберите тип конструкции, чтобы рассчитать стоимость
           </p>
