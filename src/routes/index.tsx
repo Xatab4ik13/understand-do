@@ -21,14 +21,14 @@ function Index() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
-          <div className="flex items-stretch gap-2">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row md:items-center">
+          <div className="flex h-24 items-center gap-2 md:h-32 md:items-stretch">
             <img
               src={logoUrl}
               alt="Логотип Brand Alum"
-              className="h-24 w-auto md:h-full"
+              className="h-full w-auto"
             />
-            <div className="flex flex-col">
+            <div className="flex flex-col justify-center">
               <div className="inline-flex flex-col">
                 <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
                   Brand
