@@ -5,7 +5,9 @@ import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
 import { PARTITION_MODELS } from "@/lib/configurator/models";
 import { HANDLE_COUNT_PRICES, SETS } from "@/lib/configurator/sets";
-import { calculate, formatMm, formatRub, type Selections } from "@/lib/configurator/calculate";
+import { calculate, formatMm, formatPrice, formatRub, type Selections } from "@/lib/configurator/calculate";
+import { useDealerMode, useInvalidateDealerMode } from "@/hooks/useDealerMode";
+import { dealerLogout } from "@/lib/api/dealer.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,6 +67,8 @@ function allowedSetsFor(
 function ConfiguratorPage() {
   const { typeId } = Route.useLoaderData() as { typeId: string };
   const type = getPartitionType(typeId)!;
+  const isDealer = useDealerMode();
+  const invalidateDealer = useInvalidateDealerMode();
 
   const [s, setS] = useState<Selections>(() => ({
     openingHeight: 0,
@@ -189,8 +193,32 @@ function ConfiguratorPage() {
             </Link>
             <h1 className="mt-1 truncate text-xl font-semibold">{type.name}</h1>
           </div>
+          {isDealer && (
+            <div className="flex items-center gap-2">
+              <span className="rounded-md bg-primary/10 px-2 py-0.5 font-['Inter'] text-xs font-black uppercase tracking-tight text-primary">
+                Режим дилера
+              </span>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await dealerLogout();
+                    await invalidateDealer();
+                    toast.success("Дилерский режим выключен");
+                  } catch (e) {
+                    console.error(e);
+                    toast.error("Не удалось выйти");
+                  }
+                }}
+                className="font-['Inter'] text-xs font-black uppercase tracking-tight text-foreground transition-opacity hover:opacity-70"
+              >
+                Выйти
+              </button>
+            </div>
+          )}
         </div>
       </header>
+
 
       <main className="mx-auto grid max-w-6xl gap-6 px-6 py-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
@@ -255,7 +283,7 @@ function ConfiguratorPage() {
                   <SelectContent>
                     {GLASSES.map((g) => (
                       <SelectItem key={g.id} value={g.id}>
-                        {g.name} — {formatRub(g.pricePerSqm)}/м²
+                        {g.name} — {formatPrice(g.pricePerSqm, isDealer)}/м²
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -320,7 +348,7 @@ function ConfiguratorPage() {
                             {m.code}
                           </div>
                           <div className="mt-0.5 text-[11px] text-muted-foreground">
-                            {m.price > 0 ? `+${formatRub(m.price)}` : "базовая"}
+                            {m.price > 0 ? `+${formatPrice(m.price, isDealer)}` : "базовая"}
                           </div>
                         </div>
                       </button>
@@ -342,14 +370,14 @@ function ConfiguratorPage() {
                         : s.handleCount < 5
                           ? "ручки"
                           : "ручек"}{" "}
-                      — {formatRub(HANDLE_COUNT_PRICES[s.handleCount] ?? 0)}
+                      — {formatPrice(HANDLE_COUNT_PRICES[s.handleCount] ?? 0, isDealer)}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {handleCountOptions.map((n) => (
                       <SelectItem key={n} value={String(n)}>
                         {n} {n === 1 ? "ручка" : n < 5 ? "ручки" : "ручек"} —{" "}
-                        {formatRub(HANDLE_COUNT_PRICES[n] ?? 0)}
+                        {formatPrice(HANDLE_COUNT_PRICES[n] ?? 0, isDealer)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -422,7 +450,7 @@ function ConfiguratorPage() {
                           <SelectValue>
                             {(() => {
                               const set = SETS[s.setIds[idx]];
-                              return set ? `${set.name} — ${formatRub(set.price)}` : "—";
+                              return set ? `${set.name} — ${formatPrice(set.price, isDealer)}` : "—";
                             })()}
                           </SelectValue>
                         </SelectTrigger>
@@ -431,7 +459,7 @@ function ConfiguratorPage() {
                             const set = SETS[setId];
                             return (
                               <SelectItem key={setId} value={setId}>
-                                {set.name} — {formatRub(set.price)}
+                                {set.name} — {formatPrice(set.price, isDealer)}
                               </SelectItem>
                             );
                           })}
@@ -481,36 +509,51 @@ function ConfiguratorPage() {
               <CardTitle className="text-base">Расчёт</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <Row label="Базовая цена" value={formatRub(type.basePrice)} />
+              <Row label="Базовая цена" value={formatPrice(type.basePrice, isDealer)} />
               <Row
                 label={`Стекло × ${result.totalSqm.toFixed(2)} м²`}
-                value={formatRub(result.glassPrice * result.totalSqm)}
+                value={formatPrice(result.glassPrice * result.totalSqm, isDealer)}
               />
               <Row
                 label={`Модель × ${type.sashCount}`}
-                value={formatRub(result.modelsPrice)}
+                value={formatPrice(result.modelsPrice, isDealer)}
               />
-              <Row label="Системы" value={formatRub(result.setsPrice)} />
-              <Row label="Ручки" value={formatRub(result.handlesPrice)} />
+              <Row label="Системы" value={formatPrice(result.setsPrice, isDealer)} />
+              <Row label="Ручки" value={formatPrice(result.handlesPrice, isDealer)} />
               <div className="my-2 border-t" />
-              <Row label="Цена" value={formatRub(result.totalPrice)} bold />
-              {result.isNonStandard && (
-                <Row
-                  label="Наценка нестандарт +30%"
-                  value={formatRub(result.nonStandardMarkup)}
-                />
+              {isDealer ? (
+                <>
+                  <Row label="Цена" value={formatRub(result.totalPrice)} bold />
+                  {result.isNonStandard && (
+                    <Row
+                      label="Наценка нестандарт +30%"
+                      value={formatRub(result.nonStandardMarkup)}
+                    />
+                  )}
+                  <Row
+                    label="Цена общая"
+                    value={formatRub(result.totalWithMarkup)}
+                    bold
+                  />
+                  <div className="my-2 border-t" />
+                  <Row
+                    label="Цена РРЦ (+70%)"
+                    value={formatRub(result.rrcPrice)}
+                    accent
+                  />
+                </>
+              ) : (
+                <>
+                  {result.isNonStandard && (
+                    <Row
+                      label="Наценка нестандарт"
+                      value={formatPrice(result.nonStandardMarkup, isDealer)}
+                    />
+                  )}
+                  <Row label="Цена" value={formatRub(result.rrcPrice)} accent />
+                </>
               )}
-              <Row
-                label="Цена общая"
-                value={formatRub(result.totalWithMarkup)}
-                bold
-              />
-              <div className="my-2 border-t" />
-              <Row
-                label="Цена РРЦ (+70%)"
-                value={formatRub(result.rrcPrice)}
-                accent
-              />
+
 
               {result.warnings.length > 0 && (
                 <div className="mt-3 space-y-1">
