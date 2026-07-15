@@ -152,17 +152,10 @@ function Index() {
         onOpenChange={(o) => setModal(o ? "dealer-login" : null)}
       />
 
-      <Dialog open={modal === "dealer-request"} onOpenChange={(o) => setModal(o ? "dealer-request" : null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Заявка на дилерство</DialogTitle>
-            <DialogDescription>Форма появится в следующей итерации.</DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={() => setModal(null)}>Закрыть</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <DealerRequestDialog
+        open={modal === "dealer-request"}
+        onOpenChange={(o) => setModal(o ? "dealer-request" : null)}
+      />
     </div>
   );
 }
