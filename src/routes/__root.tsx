@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import logoAsset from "../assets/logo.svg.asset.json";
+import logoAsset from "../assets/logo-icon.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const logoUrl = logoAsset.url;
