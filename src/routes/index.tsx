@@ -1,8 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { PARTITION_TYPES } from "@/lib/configurator/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatRub } from "@/lib/configurator/calculate";
 import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import logoAsset from "@/assets/logo-icon.png.asset.json";
 
 const logoUrl = logoAsset.url;
@@ -17,11 +25,18 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+type ModalKind = null | "dealer-login" | "dealer-request";
+
 function Index() {
+  const [modal, setModal] = useState<ModalKind>(null);
+
+  const menuItemClass =
+    "font-['Inter'] text-sm font-black uppercase tracking-tight text-foreground transition-opacity hover:opacity-70 md:text-base";
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row md:items-center">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 md:flex-row md:items-center md:justify-between">
           <div className="flex h-24 items-center gap-2 md:h-32 md:items-stretch">
             <img
               src={logoUrl}
@@ -43,9 +58,31 @@ function Index() {
               </span>
             </div>
           </div>
-          <p className="text-base text-muted-foreground md:text-right md:text-lg">
-            Выберите тип конструкции, чтобы рассчитать стоимость
-          </p>
+
+          <div className="flex flex-col items-center gap-2 md:items-end">
+            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 md:justify-end">
+              <button
+                type="button"
+                className={menuItemClass}
+                onClick={() => setModal("dealer-login")}
+              >
+                Для дилеров
+              </button>
+              <button
+                type="button"
+                className={menuItemClass}
+                onClick={() => setModal("dealer-request")}
+              >
+                Стать дилером
+              </button>
+              <Link to="/about" className={menuItemClass}>
+                О компании
+              </Link>
+            </nav>
+            <p className="text-sm text-muted-foreground md:text-right md:text-base">
+              Выберите тип конструкции, чтобы рассчитать стоимость
+            </p>
+          </div>
         </div>
       </header>
 
@@ -59,7 +96,6 @@ function Index() {
               className="group"
             >
               <Card className="h-full overflow-hidden transition-all duration-200 hover:border-primary hover:shadow-lg hover:-translate-y-0.5">
-                {/* Схема-фото типа */}
                 <div className="relative aspect-[4/3] overflow-hidden border-b bg-muted/20">
                   <img
                     src={TYPE_IMAGES[t.id]}
@@ -98,8 +134,20 @@ function Index() {
             </Link>
           ))}
         </div>
-
       </main>
+
+      <Dialog open={modal !== null} onOpenChange={(open) => !open && setModal(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {modal === "dealer-login" ? "Вход для дилеров" : "Заявка на дилерство"}
+            </DialogTitle>
+            <DialogDescription>
+              Форма появится в следующей итерации.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
