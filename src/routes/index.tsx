@@ -29,13 +29,15 @@ function Index() {
               className="h-20 w-auto md:h-28"
             />
             <div className="flex flex-col">
-              <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
-                Brand
-              </span>
-              <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
-                Alum
-              </span>
-              <div className="mt-1 h-[2px] w-full bg-foreground" />
+              <div className="inline-flex flex-col">
+                <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
+                  Brand
+                </span>
+                <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
+                  Alum
+                </span>
+                <div className="mt-1 h-[2px] w-full bg-foreground" />
+              </div>
               <span className="mt-1 font-['Times_New_Roman',Times,Georgia,serif] text-sm italic leading-tight text-foreground md:text-base">
                 Алюминиевые стеклянные перегородки
               </span>
