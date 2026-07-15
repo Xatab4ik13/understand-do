@@ -1,13 +1,13 @@
-import alp01 from "@/assets/models/alp-01.png.asset.json";
-import alp02 from "@/assets/models/alp-02.png.asset.json";
-import alp03 from "@/assets/models/alp-03.png.asset.json";
-import alp04 from "@/assets/models/alp-04.png.asset.json";
-import alp05 from "@/assets/models/alp-05.png.asset.json";
-import alp06 from "@/assets/models/alp-06.png.asset.json";
-import alp07 from "@/assets/models/alp-07.png.asset.json";
-import alp08 from "@/assets/models/alp-08.png.asset.json";
-import alp09 from "@/assets/models/alp-09.png.asset.json";
-import alp10 from "@/assets/models/alp-10.png.asset.json";
+import alp01 from "@/assets/models/alp-01.webp.asset.json";
+import alp02 from "@/assets/models/alp-02.webp.asset.json";
+import alp03 from "@/assets/models/alp-03.webp.asset.json";
+import alp04 from "@/assets/models/alp-04.webp.asset.json";
+import alp05 from "@/assets/models/alp-05.webp.asset.json";
+import alp06 from "@/assets/models/alp-06.webp.asset.json";
+import alp07 from "@/assets/models/alp-07.webp.asset.json";
+import alp08 from "@/assets/models/alp-08.webp.asset.json";
+import alp09 from "@/assets/models/alp-09.webp.asset.json";
+import alp10 from "@/assets/models/alp-10.webp.asset.json";
 
 export interface PartitionModel {
   id: string;
