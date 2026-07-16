@@ -153,8 +153,12 @@ function parseLines(lines: string[]): {
 export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   const [logoImg, svgImg] = await Promise.all([
     loadImage(logoUrl).catch(() => null),
-    svgToImage(opts.projectionSvg),
+    svgToImage(opts.projectionSvg).catch((e) => {
+      console.warn("SVG projection render failed", e);
+      return null;
+    }),
   ]);
+
 
   // A4 при 150 dpi
   const DPI = 150;
