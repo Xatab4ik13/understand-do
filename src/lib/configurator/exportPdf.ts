@@ -62,13 +62,12 @@ async function svgToImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
   );
 
   const xml = new XMLSerializer().serializeToString(clone);
-  const blob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  try {
-    return await loadImage(url, false);
-  } finally {
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
+  // Используем data:-URL, а не blob:. Blob-URL в некоторых браузерах
+  // помечает canvas как tainted при drawImage без CORS.
+  const dataUrl =
+    "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml);
+  return await loadImage(dataUrl, false);
+
 
 }
 

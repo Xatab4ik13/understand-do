@@ -568,7 +568,7 @@ export function PartitionProjection({
           const tickW = 0.8;
           const lineW = 0.5;
           return (
-            <g fontFamily="ui-sans-serif, system-ui" fontSize="8">
+            <g fontFamily="ui-sans-serif, system-ui" fontSize="13">
 
               {/* Высота (слева) */}
               {/* Выносные линии от рамы */}
