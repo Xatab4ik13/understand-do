@@ -228,16 +228,25 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   const padIn = 24;
   const innerW = cardW - padIn * 2;
   const innerH = cardH - padIn * 2;
-  const ratio = svgImg.width && svgImg.height ? svgImg.width / svgImg.height : 1.6;
-  let drawW = innerW;
-  let drawH = drawW / ratio;
-  if (drawH > innerH) {
-    drawH = innerH;
-    drawW = drawH * ratio;
+  if (svgImg) {
+    const ratio = svgImg.width && svgImg.height ? svgImg.width / svgImg.height : 1.6;
+    let drawW = innerW;
+    let drawH = drawW / ratio;
+    if (drawH > innerH) {
+      drawH = innerH;
+      drawW = drawH * ratio;
+    }
+    const drawX = cardX + (cardW - drawW) / 2;
+    const drawY = cardY + (cardH - drawH) / 2;
+    ctx.drawImage(svgImg, drawX, drawY, drawW, drawH);
+  } else {
+    ctx.fillStyle = COLOR_MUTED;
+    ctx.font = `18px ${FONT}`;
+    ctx.textAlign = "center";
+    ctx.fillText("(проекция недоступна)", cardX + cardW / 2, cardY + cardH / 2 - 10);
+    ctx.textAlign = "left";
   }
-  const drawX = cardX + (cardW - drawW) / 2;
-  const drawY = cardY + (cardH - drawH) / 2;
-  ctx.drawImage(svgImg, drawX, drawY, drawW, drawH);
+
 
   // ---------- Парсинг данных ----------
   const { params, sashes, prices } = parseLines(opts.lines);
