@@ -1,7 +1,4 @@
 import { jsPDF } from "jspdf";
-import logoAsset from "@/assets/logo.svg.asset.json";
-
-const logoUrl = logoAsset.url;
 
 function loadImage(url: string, useCors = true): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -141,13 +138,10 @@ function parseLines(lines: string[]): {
 }
 
 export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
-  const [logoImg, svgImg] = await Promise.all([
-    loadImage(logoUrl).catch(() => null),
-    svgToImage(opts.projectionSvg).catch((e) => {
+  const svgImg = await svgToImage(opts.projectionSvg).catch((e) => {
       console.warn("SVG projection render failed", e);
       return null;
-    }),
-  ]);
+    });
 
 
   // A4 при 150 dpi
@@ -179,10 +173,17 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   // ---------- Шапка ----------
   const headerTop = margin;
   const logoH = 100;
-  if (logoImg) {
-    const ratio = logoImg.width / logoImg.height || 2000 / 600;
-    ctx.drawImage(logoImg, margin, headerTop, logoH * ratio, logoH);
-  }
+  // Не рисуем внешний SVG-логотип в canvas: браузер помечает canvas как
+  // tainted из-за содержимого SVG, и PDF нельзя экспортировать. Текстовый
+  // логотип остаётся полностью локальным и не ломает canvas.toDataURL().
+  ctx.fillStyle = COLOR_TEXT;
+  ctx.font = `bold 36px ${FONT}`;
+  ctx.textAlign = "left";
+  ctx.fillText("BRAND ALUM", margin, headerTop + 8);
+  ctx.font = `16px ${FONT}`;
+  ctx.fillStyle = COLOR_MUTED;
+  ctx.fillText("aluminum partitions", margin, headerTop + 54);
+
   ctx.fillStyle = COLOR_TEXT;
   ctx.font = `bold 34px ${FONT}`;
   ctx.textAlign = "right";
