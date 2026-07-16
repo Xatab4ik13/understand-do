@@ -3,15 +3,16 @@ import logoAsset from "@/assets/logo.svg.asset.json";
 
 const logoUrl = logoAsset.url;
 
-function loadImage(url: string): Promise<HTMLImageElement> {
+function loadImage(url: string, useCors = true): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    if (useCors) img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
-    img.onerror = reject;
+    img.onerror = (e) => reject(new Error(`Image load failed: ${url}`));
     img.src = url;
   });
 }
+
 
 async function urlToDataUrl(url: string): Promise<string | null> {
   try {
@@ -64,10 +65,11 @@ async function svgToImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
   const blob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   try {
-    return await loadImage(url);
+    return await loadImage(url, false);
   } finally {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+
 }
 
 
@@ -151,8 +153,12 @@ function parseLines(lines: string[]): {
 export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   const [logoImg, svgImg] = await Promise.all([
     loadImage(logoUrl).catch(() => null),
-    svgToImage(opts.projectionSvg),
+    svgToImage(opts.projectionSvg).catch((e) => {
+      console.warn("SVG projection render failed", e);
+      return null;
+    }),
   ]);
+
 
   // A4 при 150 dpi
   const DPI = 150;
@@ -222,16 +228,25 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   const padIn = 24;
   const innerW = cardW - padIn * 2;
   const innerH = cardH - padIn * 2;
-  const ratio = svgImg.width && svgImg.height ? svgImg.width / svgImg.height : 1.6;
-  let drawW = innerW;
-  let drawH = drawW / ratio;
-  if (drawH > innerH) {
-    drawH = innerH;
-    drawW = drawH * ratio;
+  if (svgImg) {
+    const ratio = svgImg.width && svgImg.height ? svgImg.width / svgImg.height : 1.6;
+    let drawW = innerW;
+    let drawH = drawW / ratio;
+    if (drawH > innerH) {
+      drawH = innerH;
+      drawW = drawH * ratio;
+    }
+    const drawX = cardX + (cardW - drawW) / 2;
+    const drawY = cardY + (cardH - drawH) / 2;
+    ctx.drawImage(svgImg, drawX, drawY, drawW, drawH);
+  } else {
+    ctx.fillStyle = COLOR_MUTED;
+    ctx.font = `18px ${FONT}`;
+    ctx.textAlign = "center";
+    ctx.fillText("(проекция недоступна)", cardX + cardW / 2, cardY + cardH / 2 - 10);
+    ctx.textAlign = "left";
   }
-  const drawX = cardX + (cardW - drawW) / 2;
-  const drawY = cardY + (cardH - drawH) / 2;
-  ctx.drawImage(svgImg, drawX, drawY, drawW, drawH);
+
 
   // ---------- Парсинг данных ----------
   const { params, sashes, prices } = parseLines(opts.lines);
