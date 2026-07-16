@@ -184,17 +184,19 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   ctx.fillStyle = COLOR_MUTED;
   ctx.fillText("aluminum partitions", margin, headerTop + 48);
 
-  ctx.fillStyle = COLOR_TEXT;
-  ctx.font = `bold 26px ${FONT}`;
-  ctx.textAlign = "right";
-  ctx.fillText(opts.title, pageW - margin, headerTop + 12, pageW - margin * 2 - 360);
   ctx.font = `20px ${FONT}`;
   ctx.fillStyle = COLOR_MUTED;
+  ctx.textAlign = "right";
   ctx.fillText(
     new Date().toLocaleDateString("ru-RU"),
     pageW - margin,
-    headerTop + 52,
+    headerTop + 16,
   );
+
+  ctx.fillStyle = COLOR_TEXT;
+  ctx.font = `bold 26px ${FONT}`;
+  ctx.textAlign = "left";
+  ctx.fillText(opts.title, margin, headerTop + 78, pageW - margin * 2);
   ctx.textAlign = "left";
 
   // Толстый акцентный разделитель
