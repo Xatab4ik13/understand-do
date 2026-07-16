@@ -65,10 +65,11 @@ async function svgToImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
   const blob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   try {
-    return await loadImage(url);
+    return await loadImage(url, false);
   } finally {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+
 }
 
 
