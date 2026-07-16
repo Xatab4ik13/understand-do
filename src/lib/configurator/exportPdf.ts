@@ -3,15 +3,16 @@ import logoAsset from "@/assets/logo.svg.asset.json";
 
 const logoUrl = logoAsset.url;
 
-function loadImage(url: string): Promise<HTMLImageElement> {
+function loadImage(url: string, useCors = true): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    if (useCors) img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
-    img.onerror = reject;
+    img.onerror = (e) => reject(new Error(`Image load failed: ${url}`));
     img.src = url;
   });
 }
+
 
 async function urlToDataUrl(url: string): Promise<string | null> {
   try {
