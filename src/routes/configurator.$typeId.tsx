@@ -393,7 +393,10 @@ function ConfiguratorPage() {
               <CardTitle className="text-base">Проекция</CardTitle>
             </CardHeader>
             <CardContent>
-              <div ref={projectionWrapRef} className="w-full">
+              <div
+                ref={projectionWrapRef}
+                className="mx-auto w-full max-w-[460px] sm:max-w-[520px]"
+              >
                 <PartitionProjection
                   type={type}
                   openingHeight={s.openingHeight}
@@ -407,6 +410,7 @@ function ConfiguratorPage() {
                   handlePositions={s.handlePositions}
                 />
               </div>
+
               {TYPE_SCHEMES[type.id] && (
                 <div className="mt-4 border rounded-md bg-background p-3">
                   <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
