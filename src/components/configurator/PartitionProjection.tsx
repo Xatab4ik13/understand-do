@@ -569,13 +569,14 @@ export function PartitionProjection({
         />
 
         {/* ===== РАЗМЕРНЫЕ ЛИНИИ ===== */}
-        {(() => {
+        {openingWidth > 0 && openingHeight > 0 && (() => {
           const dimStroke = "hsl(var(--muted-foreground))";
           const dimFill = "hsl(var(--muted-foreground))";
           const tickW = 0.8;
           const lineW = 0.5;
           return (
-            <g fontFamily="ui-sans-serif, system-ui" fontSize="11">
+            <g fontFamily="ui-sans-serif, system-ui" fontSize="8">
+
               {/* Высота (слева) */}
               {/* Выносные линии от рамы */}
               <line
