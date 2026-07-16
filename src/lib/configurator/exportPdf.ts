@@ -41,35 +41,26 @@ async function svgToImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
   clone.setAttribute("width", String(w));
   clone.setAttribute("height", String(h));
 
-  // Инлайним все <image href="..."> в data-URL, иначе canvas taint при toDataURL
-  const imgEls = Array.from(clone.querySelectorAll("image"));
-  await Promise.all(
-    imgEls.map(async (el) => {
-      const href =
-        el.getAttribute("href") ||
-        el.getAttributeNS("http://www.w3.org/1999/xlink", "href");
-      if (!href || href.startsWith("data:")) return;
-      const abs = new URL(href, window.location.origin).href;
-      const dataUrl = await urlToDataUrl(abs);
-      if (dataUrl) {
-        el.setAttribute("href", dataUrl);
-        el.removeAttributeNS("http://www.w3.org/1999/xlink", "href");
-      } else {
-        // не удалось получить — удаляем image, чтобы не тейнтить canvas
-        el.parentNode?.removeChild(el);
-      }
-    }),
-  );
+  // Полностью убираем <image> — SVG с внешними/растровыми картинками
+  // в Chrome помечает canvas как tainted при drawImage, даже если сам
+  // SVG загружен через data: URL. Для PDF рисуем только векторные части.
+  clone.querySelectorAll("image").forEach((el) => {
+    // Заменяем на нейтральный светлый фон в том же месте
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    for (const attr of ["x", "y", "width", "height"]) {
+      const v = el.getAttribute(attr);
+      if (v) rect.setAttribute(attr, v);
+    }
+    rect.setAttribute("fill", "#eef0ee");
+    el.parentNode?.replaceChild(rect, el);
+  });
 
   const xml = new XMLSerializer().serializeToString(clone);
-  // Используем data:-URL, а не blob:. Blob-URL в некоторых браузерах
-  // помечает canvas как tainted при drawImage без CORS.
   const dataUrl =
     "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml);
   return await loadImage(dataUrl, false);
-
-
 }
+
 
 
 export interface PdfExportOptions {
