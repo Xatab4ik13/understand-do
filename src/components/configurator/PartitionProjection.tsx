@@ -138,7 +138,7 @@ export function PartitionProjection({
 
   const MAX_W = 760;
   const MAX_H = 440;
-  const ratio = openingWidth > 0 && openingHeight > 0 ? openingWidth / openingHeight : 1.5;
+  const ratio = openingWidth > 0 && openingHeight > 0 ? openingWidth / openingHeight : 900 / 2100;
   let drawW = MAX_W - PAD_L - PAD_R;
   let drawH = drawW / ratio;
   if (drawH > MAX_H - PAD_T - PAD_B) {
