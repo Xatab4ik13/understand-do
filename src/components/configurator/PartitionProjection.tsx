@@ -59,12 +59,14 @@ const MODEL_MULLIONS: Record<string, Mullion[]> = {
     { type: "h", y: 0.5 },
     { type: "h", y: 0.68 },
   ],
-  // ALP 10 — верхняя фрамуга + две полноразмерные вертикали (боковые)
+  // ALP 10 — верхняя и нижняя фрамуги + две полноразмерные боковые вертикали
   m10: [
     { type: "h", y: 0.08 },
+    { type: "h", y: 0.92 },
     { type: "v", x: 0.2 },
     { type: "v", x: 0.8 },
   ],
+
 };
 
 
@@ -483,30 +485,43 @@ export function PartitionProjection({
                 </g>
               )}
 
-              {/* Ручка: маленькая круглая розетка на кромке створки */}
+              {/* Ручка: прямоугольная накладка на профильную кромку створки */}
               {sash?.hasHandle &&
                 positions.map((pos) => {
-                  const { x, y } = handleCoord(pos);
+                  const { left } = handleCoord(pos);
+                  const top = pos === 2 || pos === 3;
+                  const hW = Math.max(3, Math.min(5, frameT * 0.5));
+                  const hH = Math.max(12, Math.min(22, innerH * 0.055));
+                  // Прямоугольник примыкает к внутренней кромке профиля
+                  const hx = left ? innerX : innerX + innerW - hW;
+                  // По вертикали — чуть ниже центра (или чуть выше при верхних позициях)
+                  const hy = top
+                    ? innerY + innerH * 0.35 - hH / 2
+                    : innerY + innerH * 0.55 - hH / 2;
                   return (
                     <g key={pos}>
-                      <circle
-                        cx={x}
-                        cy={y}
-                        r={3.4}
+                      <rect
+                        x={hx}
+                        y={hy}
+                        width={hW}
+                        height={hH}
                         fill={`url(#${uid}-profGrad)`}
                         stroke={prof.dark}
-                        strokeWidth={0.7}
+                        strokeWidth={0.6}
                       />
-                      <circle
-                        cx={x - 0.7}
-                        cy={y - 0.7}
-                        r={1}
-                        fill={prof.light}
-                        opacity={0.7}
+                      <line
+                        x1={hx + (left ? 0.6 : hW - 0.6)}
+                        y1={hy + 1.5}
+                        x2={hx + (left ? 0.6 : hW - 0.6)}
+                        y2={hy + hH - 1.5}
+                        stroke={prof.light}
+                        strokeOpacity={0.6}
+                        strokeWidth={0.5}
                       />
                     </g>
                   );
                 })}
+
 
             </g>
           );
