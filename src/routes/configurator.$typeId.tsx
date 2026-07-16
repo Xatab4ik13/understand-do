@@ -395,8 +395,9 @@ function ConfiguratorPage() {
             <CardContent>
               <div
                 ref={projectionWrapRef}
-                className="mx-auto w-full max-w-[340px] sm:max-w-[400px]"
+                className="mx-auto w-full"
               >
+
 
                 <PartitionProjection
                   type={type}
