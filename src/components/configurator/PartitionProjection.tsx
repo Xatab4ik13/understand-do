@@ -483,78 +483,31 @@ export function PartitionProjection({
                 </g>
               )}
 
-              {/* Ручки: розетка + горизонтальный рычаг внутрь створки */}
+              {/* Ручка: маленькая круглая розетка на кромке створки */}
               {sash?.hasHandle &&
                 positions.map((pos) => {
-                  const { x, y, left } = handleCoord(pos);
-                  // рычаг направлен ОТ ближайшей вертикальной кромки внутрь
-                  const leverLen = Math.max(22, Math.min(34, innerW * 0.16));
-                  const dir = left ? 1 : -1;
-                  const leverX1 = x;
-                  const leverX2 = x + dir * leverLen;
-                  const leverY = y;
+                  const { x, y } = handleCoord(pos);
                   return (
                     <g key={pos}>
-                      {/* Тень под фурнитурой */}
-                      <ellipse
-                        cx={x + dir * leverLen * 0.45}
-                        cy={leverY + 2}
-                        rx={leverLen * 0.55}
-                        ry={2}
-                        fill="black"
-                        opacity={0.18}
-                      />
-                      {/* Рычаг */}
-                      <line
-                        x1={leverX1}
-                        y1={leverY}
-                        x2={leverX2}
-                        y2={leverY}
-                        stroke={`url(#${uid}-profGrad)`}
-                        strokeWidth={3.2}
-                        strokeLinecap="round"
-                      />
-                      {/* Тёмный контур рычага */}
-                      <line
-                        x1={leverX1}
-                        y1={leverY}
-                        x2={leverX2}
-                        y2={leverY}
-                        stroke={prof.dark}
-                        strokeOpacity={0.55}
-                        strokeWidth={0.8}
-                        strokeLinecap="round"
-                      />
-                      {/* Блик на рычаге */}
-                      <line
-                        x1={leverX1 + dir * 3}
-                        y1={leverY - 0.9}
-                        x2={leverX2 - dir * 3}
-                        y2={leverY - 0.9}
-                        stroke={prof.light}
-                        strokeOpacity={0.75}
-                        strokeWidth={0.6}
-                        strokeLinecap="round"
-                      />
-                      {/* Розетка (накладка на стекло) */}
                       <circle
                         cx={x}
                         cy={y}
-                        r={4.2}
+                        r={3.4}
                         fill={`url(#${uid}-profGrad)`}
                         stroke={prof.dark}
-                        strokeWidth={0.8}
+                        strokeWidth={0.7}
                       />
                       <circle
-                        cx={x - 0.8}
-                        cy={y - 0.8}
-                        r={1.2}
+                        cx={x - 0.7}
+                        cy={y - 0.7}
+                        r={1}
                         fill={prof.light}
                         opacity={0.7}
                       />
                     </g>
                   );
                 })}
+
             </g>
           );
         })}
