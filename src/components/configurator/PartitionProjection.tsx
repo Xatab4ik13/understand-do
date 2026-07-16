@@ -152,12 +152,25 @@ export function PartitionProjection({
 
   const MAX_W = 760;
   const MAX_H = 440;
-  const ratio = openingWidth > 0 && openingHeight > 0 ? openingWidth / openingHeight : 900 / 2100;
-  let drawW = MAX_W - PAD_L - PAD_R;
-  let drawH = drawW / ratio;
-  if (drawH > MAX_H - PAD_T - PAD_B) {
-    drawH = MAX_H - PAD_T - PAD_B;
-    drawW = drawH * ratio;
+  const AVAIL_W = MAX_W - PAD_L - PAD_R;
+  const AVAIL_H = MAX_H - PAD_T - PAD_B;
+
+  const sashCount = type.sashCount;
+
+  // Визуальные пропорции створки нормализуем — реальные мм влияют лишь
+  // на подписи размеров, но не «плющат» и не растягивают проекцию.
+  // Створка всегда выглядит как створка (высокая, слегка узкая).
+  const rawSashRatio =
+    sashWidth > 0 && sashHeight > 0 ? sashWidth / sashHeight : 0.45;
+  // Клэмпим соотношение створки в разумных пределах.
+  const sashRatio = Math.max(0.28, Math.min(0.9, rawSashRatio));
+  const overallRatio = sashCount * sashRatio;
+
+  let drawW = AVAIL_W;
+  let drawH = drawW / overallRatio;
+  if (drawH > AVAIL_H) {
+    drawH = AVAIL_H;
+    drawW = drawH * overallRatio;
   }
   const W = drawW + PAD_L + PAD_R;
   const H = drawH + PAD_T + PAD_B;
@@ -167,12 +180,12 @@ export function PartitionProjection({
   const tint = glassTint(glassId);
   const prof = profileLook(profileId);
   const mullions = MODEL_MULLIONS[modelId] ?? [];
-  const sashCount = type.sashCount;
   const sashPxW = drawW / sashCount;
   // Толщина рамы профиля — пропорциональна, но не меньше 6 / не больше 12
   const frameT = Math.max(6, Math.min(12, drawW * 0.014));
   // Толщина импоста — заметно тоньше рамы
   const mullT = Math.max(2, frameT * 0.4);
+
 
   const uid = `proj-${modelId}-${profileId}-${glassId}`;
 
