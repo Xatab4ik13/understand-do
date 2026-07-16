@@ -13,6 +13,22 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   });
 }
 
+async function urlToDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, { mode: "cors", credentials: "omit" });
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(String(fr.result));
+      fr.onerror = reject;
+      fr.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
 async function svgToImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
   const clone = svg.cloneNode(true) as SVGSVGElement;
   if (!clone.getAttribute("xmlns")) {
@@ -23,6 +39,27 @@ async function svgToImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
   const h = vb && vb.height ? vb.height : svg.clientHeight || 500;
   clone.setAttribute("width", String(w));
   clone.setAttribute("height", String(h));
+
+  // Инлайним все <image href="..."> в data-URL, иначе canvas taint при toDataURL
+  const imgEls = Array.from(clone.querySelectorAll("image"));
+  await Promise.all(
+    imgEls.map(async (el) => {
+      const href =
+        el.getAttribute("href") ||
+        el.getAttributeNS("http://www.w3.org/1999/xlink", "href");
+      if (!href || href.startsWith("data:")) return;
+      const abs = new URL(href, window.location.origin).href;
+      const dataUrl = await urlToDataUrl(abs);
+      if (dataUrl) {
+        el.setAttribute("href", dataUrl);
+        el.removeAttributeNS("http://www.w3.org/1999/xlink", "href");
+      } else {
+        // не удалось получить — удаляем image, чтобы не тейнтить canvas
+        el.parentNode?.removeChild(el);
+      }
+    }),
+  );
+
   const xml = new XMLSerializer().serializeToString(clone);
   const blob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -32,6 +69,7 @@ async function svgToImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 }
+
 
 export interface PdfExportOptions {
   fileName: string;
