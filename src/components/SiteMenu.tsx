@@ -13,7 +13,6 @@ const itemCls =
 
 export function SiteMenu({ isDealer, onDealerLogin, onDealerRequest, onLogout }: Props) {
   const [open, setOpen] = useState(false);
-  const [productsOpen, setProductsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
