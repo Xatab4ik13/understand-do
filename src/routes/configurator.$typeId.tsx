@@ -32,7 +32,14 @@ const logoUrl = logoAsset.url;
 
 export const Route = createFileRoute("/configurator/$typeId")({
   head: ({ params }) => ({
-    meta: [{ title: `Brand Alum — ${params.typeId}` }],
+      meta: [
+        { title: `Конфигуратор ${params.typeId} — Brand Alum` },
+        { name: "description", content: "Расчёт алюминиевой стеклянной перегородки Brand Alum." },
+        { property: "og:title", content: "Конфигуратор перегородки — Brand Alum" },
+        { property: "og:description", content: "Настройте алюминиевую стеклянную перегородку и рассчитайте стоимость." },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
+      ],
   }),
   component: ConfiguratorPage,
   notFoundComponent: () => (
@@ -179,25 +186,25 @@ function ConfiguratorPage() {
   return (
     <div className="min-h-screen bg-background">
       <Toaster richColors />
-      <header className="border-b">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
+      <header className="glass-bar sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-20 max-w-6xl items-center gap-4 px-5 md:h-24 md:px-8">
           <img
             src={logoUrl}
             alt="Логотип Brand Alum"
-            className="h-16 w-auto md:h-20"
+            className="h-[74%] w-auto"
           />
           <div className="min-w-0 flex-1">
             <Link
               to="/"
-              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" /> К выбору типа
             </Link>
-            <h1 className="mt-1 truncate text-xl font-semibold">{type.name}</h1>
+            <h1 className="mt-1 truncate font-display text-lg font-semibold md:text-xl">{type.name}</h1>
           </div>
           {isDealer && (
             <div className="flex items-center gap-2">
-              <span className="rounded-md bg-primary/10 px-2 py-0.5 font-['Inter'] text-xs font-black uppercase tracking-tight text-primary">
+              <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground">
                 Режим дилера
               </span>
               <button
@@ -212,7 +219,7 @@ function ConfiguratorPage() {
                     toast.error("Не удалось выйти");
                   }
                 }}
-                className="font-['Inter'] text-xs font-black uppercase tracking-tight text-foreground transition-opacity hover:opacity-70"
+                className="text-xs font-medium text-foreground transition-opacity hover:opacity-60"
               >
                 Выйти
               </button>
@@ -222,11 +229,11 @@ function ConfiguratorPage() {
       </header>
 
 
-      <main className="mx-auto grid max-w-6xl gap-6 px-6 py-6 lg:grid-cols-[1fr_360px]">
-        <div className="space-y-6">
+      <main className="mx-auto grid max-w-6xl gap-6 px-5 py-8 md:px-8 md:py-12 lg:grid-cols-[1fr_360px]">
+        <div className="space-y-5">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Перегородка</CardTitle>
+            <CardHeader className="pb-5">
+              <CardTitle className="font-display text-xl">Перегородка</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <Field
@@ -318,8 +325,8 @@ function ConfiguratorPage() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Комплектация</CardTitle>
+            <CardHeader className="pb-5">
+              <CardTitle className="font-display text-xl">Комплектация</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">
               <Field label="Модель перегородки">
@@ -331,10 +338,10 @@ function ConfiguratorPage() {
                         key={m.id}
                         type="button"
                         onClick={() => setS({ ...s, modelId: m.id })}
-                        className={`group flex flex-col overflow-hidden rounded-md border bg-background text-left transition-all hover:border-primary ${
+                        className={`group flex flex-col overflow-hidden rounded-xl border bg-background text-left transition-[border-color,transform,box-shadow] active:scale-[0.98] ${
                           selected
-                            ? "border-primary ring-2 ring-primary"
-                            : "border-border"
+                            ? "border-primary ring-2 ring-primary/20 shadow-sm"
+                            : "border-border hover:border-muted-foreground/50"
                         }`}
                       >
                         <div className="aspect-square overflow-hidden bg-muted/30">
@@ -402,8 +409,8 @@ function ConfiguratorPage() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Проекция</CardTitle>
+            <CardHeader className="pb-5">
+              <CardTitle className="font-display text-xl">Проекция</CardTitle>
             </CardHeader>
             <CardContent>
               <div
@@ -427,8 +434,8 @@ function ConfiguratorPage() {
               </div>
 
               {TYPE_SCHEMES[type.id] && (
-                <div className="mt-4 border rounded-md bg-background p-3">
-                  <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+                <div className="mt-5 rounded-xl bg-muted p-4">
+                  <div className="mb-3 text-xs font-medium text-muted-foreground">
                     Схема типа
                   </div>
                   <img
@@ -442,8 +449,8 @@ function ConfiguratorPage() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Створки</CardTitle>
+            <CardHeader className="pb-5">
+              <CardTitle className="font-display text-xl">Створки</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {type.sashes.map((sash, idx) => {
@@ -453,7 +460,7 @@ function ConfiguratorPage() {
                 return (
                   <div
                     key={idx}
-                    className="grid gap-3 rounded-md border p-3 sm:grid-cols-2"
+                    className="grid gap-4 rounded-xl bg-muted p-4 sm:grid-cols-2"
                   >
                     <div className="sm:col-span-2 text-sm font-medium">
                       Створка {idx + 1}{" "}
@@ -524,12 +531,12 @@ function ConfiguratorPage() {
           </Card>
         </div>
 
-        <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Расчёт</CardTitle>
+        <aside className="space-y-3 lg:sticky lg:top-28 lg:self-start">
+          <Card className="bg-foreground text-background">
+            <CardHeader className="pb-5">
+              <CardTitle className="font-display text-xl text-background">Расчёт</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm">
+            <CardContent className="space-y-3 text-sm [&_.text-muted-foreground]:text-background/60 [&_.text-foreground]:text-background">
               <Row label="Базовая цена" value={formatPrice(type.basePrice, isDealer)} />
               <Row
                 label={`Стекло × ${result.totalSqm.toFixed(2)} м²`}
@@ -541,7 +548,7 @@ function ConfiguratorPage() {
               />
               <Row label="Системы" value={formatPrice(result.setsPrice, isDealer)} />
               <Row label="Ручки" value={formatPrice(result.handlesPrice, isDealer)} />
-              <div className="my-2 border-t" />
+               <div className="my-3 border-t border-background/20" />
               {isDealer ? (
                 <>
                   <Row label="Цена" value={formatRub(result.totalPrice)} bold />
@@ -556,7 +563,7 @@ function ConfiguratorPage() {
                     value={formatRub(result.totalWithMarkup)}
                     bold
                   />
-                  <div className="my-2 border-t" />
+                   <div className="my-3 border-t border-background/20" />
                   <Row
                     label="Цена РРЦ (+70%)"
                     value={formatRub(result.rrcPrice)}
@@ -581,7 +588,7 @@ function ConfiguratorPage() {
                   {result.warnings.map((w, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-2 rounded-md bg-yellow-50 p-2 text-xs text-yellow-900 dark:bg-yellow-950 dark:text-yellow-200"
+                       className="flex items-start gap-2 rounded-lg bg-background/10 p-2.5 text-xs text-background"
                     >
                       <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                       <span>{w}</span>
@@ -594,7 +601,7 @@ function ConfiguratorPage() {
                   {result.errors.map((e, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-2 rounded-md bg-destructive/10 p-2 text-xs text-destructive"
+                       className="flex items-start gap-2 rounded-lg bg-destructive/20 p-2.5 text-xs text-background"
                     >
                       <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                       <span>{e}</span>
@@ -637,7 +644,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <Label className="text-xs font-medium text-muted-foreground">{label}</Label>
       {children}
       {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
     </div>
@@ -648,7 +655,7 @@ function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-1.5">
       <Label className="text-xs text-muted-foreground">{label}</Label>
-      <div className="rounded-md border bg-muted/40 px-3 py-2 text-sm">{value}</div>
+      <div className="flex h-11 items-center rounded-xl bg-muted px-3.5 text-sm">{value}</div>
     </div>
   );
 }
@@ -667,11 +674,11 @@ function Row({
   return (
     <div
       className={`flex items-center justify-between ${
-        accent ? "text-base text-primary font-semibold" : bold ? "font-medium" : ""
+        accent ? "pt-1 text-lg font-semibold" : bold ? "font-medium" : ""
       }`}
     >
       <span className="text-muted-foreground">{label}</span>
-      <span className={accent ? "" : "text-foreground"}>{value}</span>
+      <span className={accent ? "text-background" : "text-foreground"}>{value}</span>
     </div>
   );
 }
@@ -692,7 +699,7 @@ function HandlePositionPicker({
     [1, 4],
   ];
   return (
-    <div className="mt-1 inline-grid grid-cols-2 gap-1.5 rounded-md border p-2">
+    <div className="mt-2 inline-grid grid-cols-2 gap-1.5 rounded-xl bg-background p-2">
       {grid.flat().map((pos) => {
         const isSelected = selected.includes(pos);
         return (
@@ -700,7 +707,7 @@ function HandlePositionPicker({
             type="button"
             key={pos}
             onClick={() => onToggle(pos)}
-            className={`h-9 w-9 rounded text-sm font-medium transition-colors ${
+            className={`h-9 w-9 rounded-lg text-sm font-medium transition-[background-color,color,transform] active:scale-[0.94] ${
               isSelected
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted/70"
