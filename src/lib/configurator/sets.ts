@@ -16,6 +16,7 @@ export const SETS: Record<string, SystemSet> = {
 };
 
 export const HANDLE_COUNT_PRICES: Record<number, number> = {
+  0: 0,
   1: 1287,
   2: 2574,
   3: 3861,
