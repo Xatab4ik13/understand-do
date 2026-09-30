@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConfiguratorTypeIdRouteImport } from './routes/configurator.$typeId'
 
+const ContactsRoute = ContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -32,35 +38,46 @@ const ConfiguratorTypeIdRoute = ConfiguratorTypeIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/contacts': typeof ContactsRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/contacts': typeof ContactsRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/contacts': typeof ContactsRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/configurator/$typeId'
+  fullPaths: '/' | '/about' | '/contacts' | '/configurator/$typeId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/configurator/$typeId'
-  id: '__root__' | '/' | '/about' | '/configurator/$typeId'
+  to: '/' | '/about' | '/contacts' | '/configurator/$typeId'
+  id: '__root__' | '/' | '/about' | '/contacts' | '/configurator/$typeId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ContactsRoute: typeof ContactsRoute
   ConfiguratorTypeIdRoute: typeof ConfiguratorTypeIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/contacts': {
+      id: '/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof ContactsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ContactsRoute: ContactsRoute,
   ConfiguratorTypeIdRoute: ConfiguratorTypeIdRoute,
 }
 export const routeTree = rootRouteImport

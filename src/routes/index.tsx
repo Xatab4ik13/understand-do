@@ -86,6 +86,9 @@ function Index() {
               <Link to="/about" className={menuItemClass}>
                 О компании
               </Link>
+              <Link to="/contacts" className={menuItemClass}>
+                Контакты
+              </Link>
             </nav>
             <p className="text-sm text-muted-foreground md:text-right md:text-base">
               Выберите тип конструкции, чтобы рассчитать стоимость
