@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as GlassRouteImport } from './routes/glass'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as ProfilesSlugRouteImport } from './routes/profiles.$slug'
 import { Route as ProductsBrendorsRouteImport } from './routes/products.brendors'
 import { Route as ConfiguratorTypeIdRouteImport } from './routes/configurator.$typeId'
 
+const GlassRoute = GlassRouteImport.update({
+  id: '/glass',
+  path: '/glass',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactsRoute = ContactsRouteImport.update({
   id: '/contacts',
   path: '/contacts',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contacts': typeof ContactsRoute
+  '/glass': typeof GlassRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
   '/products/brendors': typeof ProductsBrendorsRoute
   '/profiles/$slug': typeof ProfilesSlugRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contacts': typeof ContactsRoute
+  '/glass': typeof GlassRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
   '/products/brendors': typeof ProductsBrendorsRoute
   '/profiles/$slug': typeof ProfilesSlugRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contacts': typeof ContactsRoute
+  '/glass': typeof GlassRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
   '/products/brendors': typeof ProductsBrendorsRoute
   '/profiles/$slug': typeof ProfilesSlugRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contacts'
+    | '/glass'
     | '/configurator/$typeId'
     | '/products/brendors'
     | '/profiles/$slug'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contacts'
+    | '/glass'
     | '/configurator/$typeId'
     | '/products/brendors'
     | '/profiles/$slug'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contacts'
+    | '/glass'
     | '/configurator/$typeId'
     | '/products/brendors'
     | '/profiles/$slug'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactsRoute: typeof ContactsRoute
+  GlassRoute: typeof GlassRoute
   ConfiguratorTypeIdRoute: typeof ConfiguratorTypeIdRoute
   ProductsBrendorsRoute: typeof ProductsBrendorsRoute
   ProfilesSlugRoute: typeof ProfilesSlugRoute
@@ -123,6 +136,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/glass': {
+      id: '/glass'
+      path: '/glass'
+      fullPath: '/glass'
+      preLoaderRoute: typeof GlassRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contacts': {
       id: '/contacts'
       path: '/contacts'
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactsRoute: ContactsRoute,
+  GlassRoute: GlassRoute,
   ConfiguratorTypeIdRoute: ConfiguratorTypeIdRoute,
   ProductsBrendorsRoute: ProductsBrendorsRoute,
   ProfilesSlugRoute: ProfilesSlugRoute,
