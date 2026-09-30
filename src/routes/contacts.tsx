@@ -1,15 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
-import logoAsset from "@/assets/logo-icon.png.asset.json";
+import { SiteHeader } from "@/components/SiteHeader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { submitContactRequest } from "@/lib/api/contact.functions";
 import { toast } from "sonner";
-
-const logoUrl = logoAsset.url;
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({
@@ -25,6 +22,8 @@ export const Route = createFileRoute("/contacts")({
         property: "og:description",
         content: "Контакты Brand Alum: производство алюминиевых стеклянных перегородок в Москве",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Contacts,
@@ -124,49 +123,21 @@ function ContactForm() {
 function Contacts() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex h-24 items-center gap-2 md:h-32 md:items-stretch">
-            <img src={logoUrl} alt="Логотип Brand Alum" className="h-full w-auto" />
-            <div className="flex flex-col justify-center">
-              <div className="inline-flex flex-col">
-                <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
-                  Brand
-                </span>
-                <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
-                  Alum
-                </span>
-                <div className="mt-1 h-[2px] w-full bg-foreground" />
-              </div>
-              <span className="mt-1 font-sans text-sm font-medium leading-tight text-foreground md:text-base">
-                Алюминиевые стеклянные перегородки
-              </span>
-            </div>
-          </div>
+      <SiteHeader />
 
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1 font-['Inter'] text-sm font-black uppercase tracking-tight text-foreground transition-opacity hover:opacity-70 md:text-base"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Назад
-          </Link>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-6xl px-6 py-8">
-        <h1 className="font-['Inter'] text-3xl font-black uppercase tracking-tight text-foreground md:text-4xl">
+      <main className="mx-auto max-w-6xl px-5 py-12 md:px-8 md:py-20">
+        <h1 className="font-display text-4xl font-semibold leading-[1.05] text-foreground md:text-6xl">
           Контакты
         </h1>
 
-        <div className="mt-8 grid gap-10 md:grid-cols-2">
+        <div className="mt-12 grid gap-14 md:grid-cols-[0.8fr_1.2fr] md:gap-20">
           <div className="space-y-6">
             <p className="text-base leading-relaxed text-foreground md:text-lg">
               Компания Brandalum — производство межкомнатных алюминиевых стеклянных
               перегородок в Москве.
             </p>
 
-            <div>
+            <div className="border-t border-border pt-5">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">
                 Контакты
               </h2>
@@ -188,7 +159,7 @@ function Contacts() {
               </p>
             </div>
 
-            <div>
+            <div className="border-t border-border pt-5">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">
                 Адрес
               </h2>
@@ -200,7 +171,7 @@ function Contacts() {
 
           <div>
             <h2 className="text-lg font-semibold text-foreground">Форма обратной связи</h2>
-            <div className="mt-4 rounded-lg border bg-card p-5">
+            <div className="mt-5 rounded-2xl bg-card p-6 shadow-[0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent)] md:p-8">
               <ContactForm />
             </div>
           </div>
