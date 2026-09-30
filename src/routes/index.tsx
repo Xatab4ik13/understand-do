@@ -5,7 +5,7 @@ import { formatPrice } from "@/lib/configurator/calculate";
 import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
 import { DealerLoginDialog } from "@/components/DealerLoginDialog";
 import { DealerRequestDialog } from "@/components/DealerRequestDialog";
-import { ProductsMenu } from "@/components/ProductsMenu";
+import { SiteMenu } from "@/components/SiteMenu";
 
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
@@ -36,8 +36,6 @@ function Index() {
   const isDealer = useDealerMode();
   const invalidate = useInvalidateDealerMode();
 
-  const menuItemClass =
-    "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground active:scale-[0.97]";
 
   const onLogout = async () => {
     try {
