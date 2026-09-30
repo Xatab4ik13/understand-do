@@ -83,6 +83,9 @@ function Index() {
               <button type="button" className={menuItemClass} onClick={() => setModal("dealer-request")}>
                 Стать дилером
               </button>
+              <Link to="/profiles" className={menuItemClass}>
+                Алюминиевый профиль
+              </Link>
               <Link to="/about" className={menuItemClass}>
                 О компании
               </Link>
