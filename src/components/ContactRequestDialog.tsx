@@ -58,7 +58,7 @@ export function ContactRequestDialog({
         onOpenChange(o);
       }}
     >
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Оставить заявку</DialogTitle>
         </DialogHeader>
