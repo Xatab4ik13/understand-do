@@ -58,7 +58,7 @@ export function DealerRequestDialog({
         onOpenChange(o);
       }}
     >
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Стать дилером</DialogTitle>
         </DialogHeader>

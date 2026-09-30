@@ -48,7 +48,7 @@ export function DealerLoginDialog({
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) setPassword(""); onOpenChange(o); }}>
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Вход для дилеров</DialogTitle>
           
