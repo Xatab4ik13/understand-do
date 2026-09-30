@@ -59,33 +59,9 @@ export function SiteMenu({ isDealer, onDealerLogin, onDealerRequest, onLogout }:
         role="menu"
         className={`absolute right-0 top-full z-50 mt-3 w-[min(20rem,calc(100vw-2.5rem))] origin-top-right rounded-2xl border border-border/60 bg-background/95 p-2 shadow-[0_24px_60px_color-mix(in_oklab,var(--foreground)_14%,transparent)] backdrop-blur-xl transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-opacity ${open ? "pointer-events-auto scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"}`}
       >
-        <button
-          type="button"
-          className={itemCls}
-          aria-expanded={productsOpen}
-          onClick={() => setProductsOpen((v) => !v)}
-        >
+        <Link to="/products/brendors" onClick={close} className={itemCls}>
           Наша продукция
-          <ChevronDown
-            className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ${productsOpen ? "rotate-180" : ""}`}
-          />
-        </button>
-        <div
-          className={`grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${productsOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
-        >
-          <div className="overflow-hidden">
-            {PRODUCT_LINES.map((p) => (
-              <Link
-                key={p.slug}
-                to="/products/brendors"
-                onClick={close}
-                className="block rounded-xl py-2.5 pl-8 pr-4 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                {p.name}
-              </Link>
-            ))}
-          </div>
-        </div>
+        </Link>
         <Link to="/profiles" onClick={close} className={itemCls}>
           Алюминиевый профиль
         </Link>
