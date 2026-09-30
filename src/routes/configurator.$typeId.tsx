@@ -141,8 +141,8 @@ function ConfiguratorPage() {
   };
 
   const handleCountOptions = Array.from(
-    { length: type.maxHandleCount },
-    (_, i) => i + 1,
+    { length: type.maxHandleCount + 1 },
+    (_, i) => i,
   );
 
   const maxH = maxOpeningHeight(type, s.glassId);
@@ -362,24 +362,37 @@ function ConfiguratorPage() {
               <Field label="Количество ручек">
                 <Select
                   value={String(s.handleCount)}
-                  onValueChange={(v) => setS({ ...s, handleCount: Number(v) })}
+                  onValueChange={(v) =>
+                    setS((prev) => ({
+                      ...prev,
+                      handleCount: Number(v),
+                      // при выборе «без ручек» сбрасываем отмеченные позиции
+                      handlePositions:
+                        Number(v) === 0
+                          ? prev.handlePositions.map(() => [])
+                          : prev.handlePositions,
+                    }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue>
-                      {s.handleCount}{" "}
-                      {s.handleCount === 1
-                        ? "ручка"
-                        : s.handleCount < 5
-                          ? "ручки"
-                          : "ручек"}{" "}
-                      — {formatPrice(HANDLE_COUNT_PRICES[s.handleCount] ?? 0, isDealer)}
+                      {s.handleCount === 0
+                        ? "Без ручек"
+                        : `${s.handleCount} ${
+                            s.handleCount === 1
+                              ? "ручка"
+                              : s.handleCount < 5
+                                ? "ручки"
+                                : "ручек"
+                          } — ${formatPrice(HANDLE_COUNT_PRICES[s.handleCount] ?? 0, isDealer)}`}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {handleCountOptions.map((n) => (
                       <SelectItem key={n} value={String(n)}>
-                        {n} {n === 1 ? "ручка" : n < 5 ? "ручки" : "ручек"} —{" "}
-                        {formatPrice(HANDLE_COUNT_PRICES[n] ?? 0, isDealer)}
+                        {n === 0
+                          ? "Без ручек"
+                          : `${n} ${n === 1 ? "ручка" : n < 5 ? "ручки" : "ручек"} — ${formatPrice(HANDLE_COUNT_PRICES[n] ?? 0, isDealer)}`}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -493,7 +506,7 @@ function ConfiguratorPage() {
                       </Select>
                     </Field>
 
-                    {sash.hasHandle && (
+                    {sash.hasHandle && s.handleCount > 0 && (
                       <div className="sm:col-span-2">
                         <Label className="text-xs text-muted-foreground">
                           Расположение ручек
@@ -721,7 +734,7 @@ function buildSummaryLines(
     `Стекло: ${glass}`,
     `Профиль: ${profile?.code} (${profile?.name})`,
     `Модель перегородки: ${model}`,
-    `Кол-во ручек: ${s.handleCount}`,
+    `Кол-во ручек: ${s.handleCount === 0 ? "без ручек" : s.handleCount}`,
     ``,
     `Створки:`,
     ...s.setIds.map((id, i) => {
