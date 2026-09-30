@@ -181,10 +181,10 @@ export function PartitionProjection({
   const prof = profileLook(profileId);
   const mullions = MODEL_MULLIONS[modelId] ?? [];
   const sashPxW = drawW / sashCount;
-  // Толщина рамы профиля — пропорциональна, но не меньше 6 / не больше 12
-  const frameT = Math.max(6, Math.min(12, drawW * 0.014));
-  // Толщина импоста — заметно тоньше рамы
-  const mullT = Math.max(2, frameT * 0.4);
+  // Тонкий профиль: сохраняем читаемость на мобильном, но не утяжеляем проекцию.
+  const frameT = Math.max(3.5, Math.min(7, drawW * 0.008));
+  // Внутренние импосты визуально легче внешней рамы.
+  const mullT = Math.max(1.25, frameT * 0.36);
 
 
   const uid = `proj-${modelId}-${profileId}-${glassId}`;
