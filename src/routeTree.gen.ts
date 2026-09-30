@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfilesIndexRouteImport } from './routes/profiles.index'
 import { Route as ProfilesSlugRouteImport } from './routes/profiles.$slug'
+import { Route as ProductsBrendorsRouteImport } from './routes/products.brendors'
 import { Route as ConfiguratorTypeIdRouteImport } from './routes/configurator.$typeId'
 
 const ContactsRoute = ContactsRouteImport.update({
@@ -41,6 +42,11 @@ const ProfilesSlugRoute = ProfilesSlugRouteImport.update({
   path: '/profiles/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductsBrendorsRoute = ProductsBrendorsRouteImport.update({
+  id: '/products/brendors',
+  path: '/products/brendors',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfiguratorTypeIdRoute = ConfiguratorTypeIdRouteImport.update({
   id: '/configurator/$typeId',
   path: '/configurator/$typeId',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contacts': typeof ContactsRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
+  '/products/brendors': typeof ProductsBrendorsRoute
   '/profiles/$slug': typeof ProfilesSlugRoute
   '/profiles/': typeof ProfilesIndexRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contacts': typeof ContactsRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
+  '/products/brendors': typeof ProductsBrendorsRoute
   '/profiles/$slug': typeof ProfilesSlugRoute
   '/profiles': typeof ProfilesIndexRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contacts': typeof ContactsRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
+  '/products/brendors': typeof ProductsBrendorsRoute
   '/profiles/$slug': typeof ProfilesSlugRoute
   '/profiles/': typeof ProfilesIndexRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contacts'
     | '/configurator/$typeId'
+    | '/products/brendors'
     | '/profiles/$slug'
     | '/profiles/'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contacts'
     | '/configurator/$typeId'
+    | '/products/brendors'
     | '/profiles/$slug'
     | '/profiles'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contacts'
     | '/configurator/$typeId'
+    | '/products/brendors'
     | '/profiles/$slug'
     | '/profiles/'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactsRoute: typeof ContactsRoute
   ConfiguratorTypeIdRoute: typeof ConfiguratorTypeIdRoute
+  ProductsBrendorsRoute: typeof ProductsBrendorsRoute
   ProfilesSlugRoute: typeof ProfilesSlugRoute
   ProfilesIndexRoute: typeof ProfilesIndexRoute
 }
@@ -145,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfilesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/products/brendors': {
+      id: '/products/brendors'
+      path: '/products/brendors'
+      fullPath: '/products/brendors'
+      preLoaderRoute: typeof ProductsBrendorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/configurator/$typeId': {
       id: '/configurator/$typeId'
       path: '/configurator/$typeId'
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ContactsRoute: ContactsRoute,
   ConfiguratorTypeIdRoute: ConfiguratorTypeIdRoute,
+  ProductsBrendorsRoute: ProductsBrendorsRoute,
   ProfilesSlugRoute: ProfilesSlugRoute,
   ProfilesIndexRoute: ProfilesIndexRoute,
 }

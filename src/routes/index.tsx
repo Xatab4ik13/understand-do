@@ -5,6 +5,7 @@ import { formatPrice } from "@/lib/configurator/calculate";
 import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
 import { DealerLoginDialog } from "@/components/DealerLoginDialog";
 import { DealerRequestDialog } from "@/components/DealerRequestDialog";
+import { ProductsMenu } from "@/components/ProductsMenu";
 
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
@@ -85,6 +86,7 @@ function Index() {
               <button type="button" className={menuItemClass} onClick={() => setModal("dealer-request")}>
                 Стать дилером
               </button>
+              <ProductsMenu itemClass={menuItemClass} />
               <Link to="/profiles" className={menuItemClass}>
                 Алюминиевый профиль
               </Link>
