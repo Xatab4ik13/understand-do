@@ -54,7 +54,7 @@ function Index() {
     <div className="min-h-screen bg-background">
       <Toaster richColors />
       <header className="glass-bar sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-3 md:h-24 md:flex-row md:items-center md:justify-between md:px-8 md:py-0">
+        <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-4 px-5 md:h-24 md:px-8">
           <div className="flex h-14 items-center gap-2.5 md:h-full">
             <img src={logoUrl} alt="Логотип Brand Alum" className="h-full w-auto" />
             <div className="flex flex-col justify-center">
@@ -72,34 +72,16 @@ function Index() {
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-2 md:items-end">
-            <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 md:justify-end">
-              {isDealer ? (
-                <button type="button" className={menuItemClass} onClick={onLogout}>
-                  Выйти
-                </button>
-              ) : (
-                <button type="button" className={menuItemClass} onClick={() => setModal("dealer-login")}>
-                  Для дилеров
-                </button>
-              )}
-              <button type="button" className={menuItemClass} onClick={() => setModal("dealer-request")}>
-                Стать дилером
-              </button>
-              <ProductsMenu itemClass={menuItemClass} />
-              <Link to="/profiles" className={menuItemClass}>
-                Алюминиевый профиль
-              </Link>
-              <Link to="/about" className={menuItemClass}>
-                О компании
-              </Link>
-              <Link to="/contacts" className={menuItemClass}>
-                Контакты
-              </Link>
-            </nav>
-            <p className="hidden text-sm text-muted-foreground md:block md:text-right">
+          <div className="flex items-center gap-4">
+            <p className="hidden text-sm text-muted-foreground lg:block">
               Выберите тип конструкции, чтобы рассчитать стоимость
             </p>
+            <SiteMenu
+              isDealer={isDealer}
+              onDealerLogin={() => setModal("dealer-login")}
+              onDealerRequest={() => setModal("dealer-request")}
+              onLogout={onLogout}
+            />
           </div>
         </div>
       </header>
