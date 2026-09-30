@@ -5,6 +5,7 @@ import { formatPrice } from "@/lib/configurator/calculate";
 import { TYPE_IMAGES } from "@/lib/configurator/typeImages";
 import { DealerLoginDialog } from "@/components/DealerLoginDialog";
 import { DealerRequestDialog } from "@/components/DealerRequestDialog";
+import { ProductsMenu } from "@/components/ProductsMenu";
 
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
