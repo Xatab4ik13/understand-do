@@ -33,7 +33,7 @@ export function ProductsMenu({ itemClass }: { itemClass: string }) {
         aria-haspopup="menu"
         aria-expanded={open}
         className={itemClass}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen(true)}
       >
         Наша продукция
       </button>
