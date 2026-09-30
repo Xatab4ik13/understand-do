@@ -4,28 +4,27 @@ import logoAsset from "@/assets/logo-icon.png.asset.json";
 
 export function SiteHeader({ backTo = "/" }: { backTo?: string }) {
   return (
-    <header className="border-b">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 md:flex-row md:items-center md:justify-between">
-        <div className="flex h-24 items-center gap-2 md:h-32 md:items-stretch">
-          <img src={logoAsset.url} alt="Логотип Brand Alum" className="h-full w-auto" />
+    <header className="glass-bar sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl">
+      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-6 px-5 md:h-24 md:px-8">
+        <Link to="/" className="flex h-full min-w-0 items-center gap-2.5 transition-opacity hover:opacity-70">
+          <img src={logoAsset.url} alt="Логотип Brand Alum" className="h-[78%] w-auto shrink-0" />
           <div className="flex flex-col justify-center">
             <div className="inline-flex flex-col">
-              <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
+              <span className="font-display text-2xl font-semibold uppercase leading-[0.82] text-foreground md:text-[2rem]">
                 Brand
               </span>
-              <span className="font-['Inter'] text-[2.5rem] font-black uppercase leading-[0.85] tracking-tight text-foreground md:text-[3.25rem]">
+              <span className="font-display text-2xl font-semibold uppercase leading-[0.82] text-foreground md:text-[2rem]">
                 Alum
               </span>
-              <div className="mt-1 h-[2px] w-full bg-foreground" />
             </div>
-            <span className="mt-1 font-sans text-sm font-medium leading-tight text-foreground md:text-base">
+            <span className="mt-1 hidden text-[0.68rem] font-medium leading-tight text-muted-foreground sm:block md:text-xs">
               Алюминиевые стеклянные перегородки
             </span>
           </div>
-        </div>
+        </Link>
         <Link
           to={backTo}
-          className="inline-flex items-center gap-1 font-['Inter'] text-sm font-black uppercase tracking-tight text-foreground transition-opacity hover:opacity-70 md:text-base"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.97]"
         >
           <ArrowLeft className="h-4 w-4" />
           Назад
