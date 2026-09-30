@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProfilesIndexRouteImport } from './routes/profiles.index'
+import { Route as ProfilesSlugRouteImport } from './routes/profiles.$slug'
 import { Route as ConfiguratorTypeIdRouteImport } from './routes/configurator.$typeId'
 
 const ContactsRoute = ContactsRouteImport.update({
@@ -29,6 +31,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfilesIndexRoute = ProfilesIndexRouteImport.update({
+  id: '/profiles/',
+  path: '/profiles/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfilesSlugRoute = ProfilesSlugRouteImport.update({
+  id: '/profiles/$slug',
+  path: '/profiles/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfiguratorTypeIdRoute = ConfiguratorTypeIdRouteImport.update({
   id: '/configurator/$typeId',
   path: '/configurator/$typeId',
@@ -40,12 +52,16 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contacts': typeof ContactsRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
+  '/profiles/$slug': typeof ProfilesSlugRoute
+  '/profiles/': typeof ProfilesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contacts': typeof ContactsRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
+  '/profiles/$slug': typeof ProfilesSlugRoute
+  '/profiles': typeof ProfilesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +69,34 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contacts': typeof ContactsRoute
   '/configurator/$typeId': typeof ConfiguratorTypeIdRoute
+  '/profiles/$slug': typeof ProfilesSlugRoute
+  '/profiles/': typeof ProfilesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/contacts' | '/configurator/$typeId'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/contacts'
+    | '/configurator/$typeId'
+    | '/profiles/$slug'
+    | '/profiles/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contacts' | '/configurator/$typeId'
-  id: '__root__' | '/' | '/about' | '/contacts' | '/configurator/$typeId'
+  to:
+    | '/'
+    | '/about'
+    | '/contacts'
+    | '/configurator/$typeId'
+    | '/profiles/$slug'
+    | '/profiles'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/contacts'
+    | '/configurator/$typeId'
+    | '/profiles/$slug'
+    | '/profiles/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +104,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactsRoute: typeof ContactsRoute
   ConfiguratorTypeIdRoute: typeof ConfiguratorTypeIdRoute
+  ProfilesSlugRoute: typeof ProfilesSlugRoute
+  ProfilesIndexRoute: typeof ProfilesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,6 +131,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profiles/': {
+      id: '/profiles/'
+      path: '/profiles'
+      fullPath: '/profiles/'
+      preLoaderRoute: typeof ProfilesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profiles/$slug': {
+      id: '/profiles/$slug'
+      path: '/profiles/$slug'
+      fullPath: '/profiles/$slug'
+      preLoaderRoute: typeof ProfilesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/configurator/$typeId': {
       id: '/configurator/$typeId'
       path: '/configurator/$typeId'
@@ -107,6 +160,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ContactsRoute: ContactsRoute,
   ConfiguratorTypeIdRoute: ConfiguratorTypeIdRoute,
+  ProfilesSlugRoute: ProfilesSlugRoute,
+  ProfilesIndexRoute: ProfilesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
