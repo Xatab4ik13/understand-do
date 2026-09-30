@@ -4,3 +4,4 @@
 - [x] Redesign the shared header and public pages
 - [x] Redesign the configurator without changing its calculations or workflows
 - [x] Verify desktop and mobile layouts, interactions, and build status
+- [x] Add the «Наша продукция» menu with the «Брендорс» photo gallery page
