@@ -1,7 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { PRODUCT_LINES } from "@/lib/products";
 
 type Props = {
   isDealer: boolean;
