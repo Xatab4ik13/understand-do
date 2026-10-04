@@ -34,6 +34,7 @@ export const Route = createFileRoute("/profiles/$slug")({
 
 function ProfilePage() {
   const { profile } = Route.useLoaderData();
+  const [lightbox, setLightbox] = useState<LightboxImage>(null);
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader backTo="/profiles" />
@@ -45,9 +46,14 @@ function ProfilePage() {
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 md:mt-14 lg:grid-cols-4">
           {profile.colors.map((c) => (
             <figure key={c} className="group overflow-hidden rounded-2xl bg-card transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_color-mix(in_oklab,var(--foreground)_10%,transparent)]">
-              <div className="aspect-square overflow-hidden bg-muted">
+              <button
+                type="button"
+                aria-label={`Открыть фото — ${profile.name}, ${colorName(c)}`}
+                onClick={() => setLightbox({ src: profileImage(profile.slug, c), alt: `${profile.name} — ${colorName(c)}` })}
+                className="block aspect-square w-full cursor-zoom-in overflow-hidden bg-muted"
+              >
                 <img src={profileImage(profile.slug, c)} alt={`${profile.name} — ${colorName(c)}`} loading="lazy" className="h-full w-full object-contain p-5 transition-transform duration-500 group-hover:scale-[1.035]" />
-              </div>
+              </button>
               <figcaption className="p-5 text-sm font-medium text-foreground">{colorName(c)}</figcaption>
             </figure>
           ))}
@@ -57,11 +63,19 @@ function ProfilePage() {
             <p className="mb-3 text-sm font-medium text-muted-foreground">Техническая документация</p>
             <h2 className="font-display text-3xl font-semibold text-foreground md:text-4xl">Схема</h2>
             <div className="mt-8 flex min-h-[360px] items-center justify-center rounded-2xl bg-card p-8 md:min-h-[520px] md:p-14">
-              <img src={profile.scheme} alt={`Схема — ${profile.name}`} className="max-h-[440px] w-auto object-contain" />
+              <button
+                type="button"
+                aria-label={`Открыть схему — ${profile.name}`}
+                onClick={() => setLightbox({ src: profile.scheme!, alt: `Схема — ${profile.name}` })}
+                className="cursor-zoom-in"
+              >
+                <img src={profile.scheme} alt={`Схема — ${profile.name}`} className="max-h-[440px] w-auto object-contain" />
+              </button>
             </div>
           </section>
         )}
       </main>
+      <Lightbox image={lightbox} onClose={() => setLightbox(null)} />
     </div>
   );
 }
