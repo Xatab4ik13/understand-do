@@ -1,5 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Lightbox, type LightboxImage } from "@/components/Lightbox";
 import { PROFILES, profileImage, colorName } from "@/lib/profiles";
 
 export const Route = createFileRoute("/profiles/$slug")({

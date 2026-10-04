@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Lightbox, type LightboxImage } from "@/components/Lightbox";
 import { GLASS_TYPES, glassImage } from "@/lib/glass";
 
 export const Route = createFileRoute("/glass")({
@@ -21,6 +23,8 @@ export const Route = createFileRoute("/glass")({
 });
 
 function GlassPage() {
+  const [lightbox, setLightbox] = useState<LightboxImage>(null);
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
@@ -31,19 +35,27 @@ function GlassPage() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
           {GLASS_TYPES.map((g) => (
             <figure key={g.slug} className="overflow-hidden rounded-2xl border border-border/60 bg-card">
-              <img
-                src={glassImage(g.slug)}
-                alt={g.name}
-                width={768}
-                height={1024}
-                loading="lazy"
-                className="aspect-[3/4] w-full object-cover"
-              />
+              <button
+                type="button"
+                aria-label={`Открыть фото — ${g.name}`}
+                onClick={() => setLightbox({ src: glassImage(g.slug), alt: g.name })}
+                className="block w-full cursor-zoom-in"
+              >
+                <img
+                  src={glassImage(g.slug)}
+                  alt={g.name}
+                  width={768}
+                  height={1024}
+                  loading="lazy"
+                  className="aspect-[3/4] w-full object-cover"
+                />
+              </button>
               <figcaption className="px-4 py-3 text-sm font-medium text-foreground">{g.name}</figcaption>
             </figure>
           ))}
         </div>
       </main>
+      <Lightbox image={lightbox} onClose={() => setLightbox(null)} />
     </div>
   );
 }
