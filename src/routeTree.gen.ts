@@ -9,23 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as GlassRouteImport } from './routes/glass'
-import { Route as ContactsRouteImport } from './routes/contacts'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContactsRouteImport } from './routes/contacts'
+import { Route as GlassRouteImport } from './routes/glass'
+import { Route as ConfiguratorTypeIdRouteImport } from './routes/configurator.$typeId'
+import { Route as ProductsBrendorsRouteImport } from './routes/products.brendors'
 import { Route as ProfilesIndexRouteImport } from './routes/profiles.index'
 import { Route as ProfilesSlugRouteImport } from './routes/profiles.$slug'
-import { Route as ProductsBrendorsRouteImport } from './routes/products.brendors'
-import { Route as ConfiguratorTypeIdRouteImport } from './routes/configurator.$typeId'
 
-const GlassRoute = GlassRouteImport.update({
-  id: '/glass',
-  path: '/glass',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactsRoute = ContactsRouteImport.update({
-  id: '/contacts',
-  path: '/contacts',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -33,9 +28,24 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ContactsRoute = ContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GlassRoute = GlassRouteImport.update({
+  id: '/glass',
+  path: '/glass',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguratorTypeIdRoute = ConfiguratorTypeIdRouteImport.update({
+  id: '/configurator/$typeId',
+  path: '/configurator/$typeId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsBrendorsRoute = ProductsBrendorsRouteImport.update({
+  id: '/products/brendors',
+  path: '/products/brendors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfilesIndexRoute = ProfilesIndexRouteImport.update({
@@ -46,16 +56,6 @@ const ProfilesIndexRoute = ProfilesIndexRouteImport.update({
 const ProfilesSlugRoute = ProfilesSlugRouteImport.update({
   id: '/profiles/$slug',
   path: '/profiles/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductsBrendorsRoute = ProductsBrendorsRouteImport.update({
-  id: '/products/brendors',
-  path: '/products/brendors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfiguratorTypeIdRoute = ConfiguratorTypeIdRouteImport.update({
-  id: '/configurator/$typeId',
-  path: '/configurator/$typeId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -136,18 +136,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/glass': {
-      id: '/glass'
-      path: '/glass'
-      fullPath: '/glass'
-      preLoaderRoute: typeof GlassRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contacts': {
-      id: '/contacts'
-      path: '/contacts'
-      fullPath: '/contacts'
-      preLoaderRoute: typeof ContactsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -157,11 +150,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/contacts': {
+      id: '/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof ContactsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/glass': {
+      id: '/glass'
+      path: '/glass'
+      fullPath: '/glass'
+      preLoaderRoute: typeof GlassRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configurator/$typeId': {
+      id: '/configurator/$typeId'
+      path: '/configurator/$typeId'
+      fullPath: '/configurator/$typeId'
+      preLoaderRoute: typeof ConfiguratorTypeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products/brendors': {
+      id: '/products/brendors'
+      path: '/products/brendors'
+      fullPath: '/products/brendors'
+      preLoaderRoute: typeof ProductsBrendorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profiles/': {
@@ -176,20 +190,6 @@ declare module '@tanstack/react-router' {
       path: '/profiles/$slug'
       fullPath: '/profiles/$slug'
       preLoaderRoute: typeof ProfilesSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products/brendors': {
-      id: '/products/brendors'
-      path: '/products/brendors'
-      fullPath: '/products/brendors'
-      preLoaderRoute: typeof ProductsBrendorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configurator/$typeId': {
-      id: '/configurator/$typeId'
-      path: '/configurator/$typeId'
-      fullPath: '/configurator/$typeId'
-      preLoaderRoute: typeof ConfiguratorTypeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
