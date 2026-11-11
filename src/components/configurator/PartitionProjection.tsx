@@ -1,6 +1,7 @@
 import { GLASSES } from "@/lib/configurator/glasses";
 import { PROFILES } from "@/lib/configurator/profiles";
 import { formatMm } from "@/lib/configurator/calculate";
+import { projectionGeometry } from "@/lib/configurator/projectionGeometry";
 import type { PartitionType, OpeningOption } from "@/lib/configurator/types";
 
 /**
@@ -150,28 +151,8 @@ export function PartitionProjection({
   const PAD_T = 28;
   const PAD_B = 76;
 
-  const MAX_W = 760;
-  const MAX_H = 440;
-  const AVAIL_W = MAX_W - PAD_L - PAD_R;
-  const AVAIL_H = MAX_H - PAD_T - PAD_B;
-
   const sashCount = type.sashCount;
-
-  // Визуальные пропорции створки нормализуем — реальные мм влияют лишь
-  // на подписи размеров, но не «плющат» и не растягивают проекцию.
-  // Створка всегда выглядит как створка (высокая, слегка узкая).
-  const rawSashRatio =
-    sashWidth > 0 && sashHeight > 0 ? sashWidth / sashHeight : 0.45;
-  // Клэмпим соотношение створки в разумных пределах.
-  const sashRatio = Math.max(0.28, Math.min(0.9, rawSashRatio));
-  const overallRatio = sashCount * sashRatio;
-
-  let drawW = AVAIL_W;
-  let drawH = drawW / overallRatio;
-  if (drawH > AVAIL_H) {
-    drawH = AVAIL_H;
-    drawW = drawH * overallRatio;
-  }
+  const { drawW, drawH, sashPxW } = projectionGeometry(sashWidth, sashHeight, sashCount);
   const W = drawW + PAD_L + PAD_R;
   const H = drawH + PAD_T + PAD_B;
   const x0 = PAD_L;
@@ -180,12 +161,8 @@ export function PartitionProjection({
   const tint = glassTint(glassId);
   const prof = profileLook(profileId);
   const mullions = MODEL_MULLIONS[modelId] ?? [];
-  const sashPxW = drawW / sashCount;
-  // Тонкий профиль: сохраняем читаемость на мобильном, но не утяжеляем проекцию.
-  const frameT = Math.max(3.5, Math.min(7, drawW * 0.008));
-  // Внутренние импосты визуально легче внешней рамы.
-  const mullT = Math.max(1.25, frameT * 0.36);
-
+  const frameT = Math.max(1.1, Math.min(2.4, drawH * 0.006));
+  const mullT = Math.max(0.6, frameT * 0.4);
 
   const uid = `proj-${modelId}-${profileId}-${glassId}`;
 
@@ -204,7 +181,7 @@ export function PartitionProjection({
           height={h - 1}
           fill="none"
           stroke={prof.dark}
-          strokeWidth={t + 1}
+          strokeWidth={t + 0.3}
         />
         <rect
           x={sx + 0.5}
@@ -216,14 +193,14 @@ export function PartitionProjection({
           strokeWidth={t}
         />
         <rect
-          x={sx + t - 0.5}
-          y={sy + t - 0.5}
-          width={w - (t - 0.5) * 2}
-          height={h - (t - 0.5) * 2}
+          x={sx + t / 2 + 0.5}
+          y={sy + t / 2 + 0.5}
+          width={w - t - 1}
+          height={h - t - 1}
           fill="none"
           stroke={prof.light}
           strokeOpacity={0.55}
-          strokeWidth={1}
+          strokeWidth={0.35}
         />
       </g>
     );
@@ -367,7 +344,7 @@ export function PartitionProjection({
                         x2={x2}
                         y2={yy}
                         stroke={prof.dark}
-                        strokeWidth={mullT + 1}
+                        strokeWidth={mullT + 0.25}
                         strokeOpacity={0.85}
                       />
                       <line
@@ -401,7 +378,7 @@ export function PartitionProjection({
                       x2={xx}
                       y2={y2}
                       stroke={prof.dark}
-                      strokeWidth={mullT + 1}
+                      strokeWidth={mullT + 0.25}
                       strokeOpacity={0.85}
                     />
                     <line
@@ -469,7 +446,7 @@ export function PartitionProjection({
                           y1={cy}
                           x2={xR}
                           y2={cy}
-                          stroke="hsl(var(--primary))"
+                          stroke="var(--primary)"
                           strokeOpacity={0.35}
                           strokeWidth={1}
                           strokeDasharray="3 3"
@@ -480,14 +457,14 @@ export function PartitionProjection({
                           y1={cy}
                           x2={xArrowEnd}
                           y2={cy}
-                          stroke="hsl(var(--primary))"
+                          stroke="var(--primary)"
                           strokeWidth={1.6}
                           strokeLinecap="round"
                         />
                         <polyline
                           points={`${xArrowEnd + (isLeft ? head : -head)},${cy - head} ${xArrowEnd},${cy} ${xArrowEnd + (isLeft ? head : -head)},${cy + head}`}
                           fill="none"
-                          stroke="hsl(var(--primary))"
+                          stroke="var(--primary)"
                           strokeWidth={1.6}
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -556,19 +533,19 @@ export function PartitionProjection({
           y1={y0 + drawH + 1}
           x2={x0 + drawW + 20}
           y2={y0 + drawH + 1}
-          stroke="hsl(var(--foreground))"
+          stroke="var(--foreground)"
           strokeOpacity={0.25}
           strokeWidth={0.8}
         />
 
         {/* ===== РАЗМЕРНЫЕ ЛИНИИ ===== */}
         {openingWidth > 0 && openingHeight > 0 && (() => {
-          const dimStroke = "hsl(var(--muted-foreground))";
-          const dimFill = "hsl(var(--muted-foreground))";
+          const dimStroke = "var(--muted-foreground)";
+          const dimFill = "var(--muted-foreground)";
           const tickW = 0.8;
           const lineW = 0.5;
           return (
-            <g fontFamily="ui-sans-serif, system-ui" fontSize="13">
+            <g fontFamily="ui-sans-serif, system-ui" fontSize="10">
 
               {/* Высота (слева) */}
               {/* Выносные линии от рамы */}
@@ -635,9 +612,9 @@ export function PartitionProjection({
                 strokeWidth={lineW}
               />
               <line
-                x1={x0 + drawW}
+                x1={x0 + sashPxW}
                 y1={y0 + drawH + 26}
-                x2={x0 + drawW}
+                x2={x0 + sashPxW}
                 y2={y0 + drawH + 46}
                 stroke={dimStroke}
                 strokeWidth={lineW}
@@ -645,7 +622,7 @@ export function PartitionProjection({
               <line
                 x1={x0}
                 y1={y0 + drawH + 36}
-                x2={x0 + drawW}
+                x2={x0 + sashPxW}
                 y2={y0 + drawH + 36}
                 stroke={dimStroke}
                 strokeWidth={tickW}
@@ -659,9 +636,9 @@ export function PartitionProjection({
                 strokeWidth={tickW}
               />
               <line
-                x1={x0 + drawW - 4}
+                x1={x0 + sashPxW - 4}
                 y1={y0 + drawH + 32}
-                x2={x0 + drawW + 4}
+                x2={x0 + sashPxW + 4}
                 y2={y0 + drawH + 40}
                 stroke={dimStroke}
                 strokeWidth={tickW}
@@ -673,7 +650,7 @@ export function PartitionProjection({
                 fontWeight={500}
                 fill={dimFill}
               >
-                {formatMm(sashWidth)} × {formatMm(sashHeight)} мм (створка)
+                Створка: {formatMm(sashWidth)} × {formatMm(sashHeight)} мм
               </text>
             </g>
           );

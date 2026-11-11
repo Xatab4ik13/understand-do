@@ -415,7 +415,7 @@ function ConfiguratorPage() {
             <CardContent>
               <div
                 ref={projectionWrapRef}
-                className="mx-auto w-full"
+                className="mx-auto w-full max-w-[380px] sm:max-w-[440px] [&_svg]:max-h-[300px]"
               >
 
 
@@ -441,7 +441,7 @@ function ConfiguratorPage() {
                   <img
                     src={TYPE_SCHEMES[type.id]}
                     alt={`Схема ${type.name}`}
-                    className="w-full h-auto object-contain"
+                    className="mx-auto h-auto max-h-[160px] w-full max-w-[440px] object-contain"
                   />
                 </div>
               )}

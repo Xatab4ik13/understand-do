@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { fitsPdfPage } from "./pdfLayout";
 
 function loadImage(url: string, useCors = true): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -153,7 +154,9 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   const canvas = document.createElement("canvas");
   canvas.width = pageW;
   canvas.height = pageH;
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Не удалось создать печатный лист");
+  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
 
   // Фон
   ctx.fillStyle = "#ffffff";
@@ -208,7 +211,7 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   const cardX = margin;
   const cardY = dividerY + 28;
   const cardW = pageW - margin * 2;
-  const cardH = Math.round(pageH * 0.36);
+  const cardH = Math.round(pageH * 0.27);
 
   ctx.fillStyle = COLOR_CARD_BG;
   roundRect(ctx, cardX, cardY, cardW, cardH, 12);
@@ -245,6 +248,22 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
   const { params, sashes, prices } = parseLines(opts.lines);
 
   let y = cardY + cardH + 36;
+  const savePage = () => {
+    ctx.fillStyle = COLOR_MUTED;
+    ctx.font = `14px ${FONT}`;
+    ctx.textAlign = "center";
+    ctx.fillText("Сформировано в конфигураторе перегородок Brand Alum", pageW / 2, pageH - margin + 12);
+    doc.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, 210, 297);
+    ctx.textAlign = "left";
+  };
+  const ensureSpace = (height: number) => {
+    if (fitsPdfPage(y, height, pageH, margin)) return;
+    savePage();
+    doc.addPage();
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, pageW, pageH);
+    y = margin;
+  };
 
   const drawSectionTitle = (text: string) => {
     ctx.fillStyle = COLOR_ACCENT;
@@ -307,6 +326,7 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
 
   // ---------- Створки ----------
   if (sashes.length > 0) {
+    ensureSpace(40 + 36 * sashes.length + 16 + 28);
     drawSectionTitle("Створки");
     const sRowH = 36;
     const sH = sRowH * sashes.length + 16;
@@ -328,10 +348,11 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
 
   // ---------- Цены ----------
   if (prices.length > 0) {
+    ensureSpace(40 + prices.length * 54);
     drawSectionTitle("Стоимость");
     const pRowH = 46;
     prices.forEach((p) => {
-      if (y + pRowH > pageH - margin) return;
+      ensureSpace(pRowH + 8);
       if (p.highlight) {
         ctx.fillStyle = COLOR_HIGHLIGHT_BG;
         roundRect(ctx, tableX, y, tableW, pRowH, 8);
@@ -364,19 +385,6 @@ export async function exportOrderToPdf(opts: PdfExportOptions): Promise<void> {
     ctx.textAlign = "left";
   }
 
-  // ---------- Футер ----------
-  ctx.fillStyle = COLOR_MUTED;
-  ctx.font = `14px ${FONT}`;
-  ctx.textAlign = "center";
-  ctx.fillText(
-    "Сформировано в конфигураторе перегородок Brand Alum",
-    pageW / 2,
-    pageH - margin + 12,
-  );
-
-  // ---------- В PDF ----------
-  const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  doc.addImage(dataUrl, "JPEG", 0, 0, 210, 297);
+  savePage();
   doc.save(opts.fileName);
 }
