@@ -415,7 +415,7 @@ function ConfiguratorPage() {
             <CardContent>
               <div
                 ref={projectionWrapRef}
-                className={type.sashCount === 1 ? "mx-auto w-full max-w-[300px] [&_svg]:max-h-[300px]" : "mx-auto w-full"}
+                className={type.sashCount === 1 ? "mx-auto w-full max-w-[345px] [&_svg]:max-h-[345px]" : "mx-auto w-full"}
               >
 
 
