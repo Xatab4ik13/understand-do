@@ -446,7 +446,7 @@ export function PartitionProjection({
                           y1={cy}
                           x2={xR}
                           y2={cy}
-                          stroke="hsl(var(--primary))"
+                          stroke="var(--primary)"
                           strokeOpacity={0.35}
                           strokeWidth={1}
                           strokeDasharray="3 3"
@@ -457,14 +457,14 @@ export function PartitionProjection({
                           y1={cy}
                           x2={xArrowEnd}
                           y2={cy}
-                          stroke="hsl(var(--primary))"
+                          stroke="var(--primary)"
                           strokeWidth={1.6}
                           strokeLinecap="round"
                         />
                         <polyline
                           points={`${xArrowEnd + (isLeft ? head : -head)},${cy - head} ${xArrowEnd},${cy} ${xArrowEnd + (isLeft ? head : -head)},${cy + head}`}
                           fill="none"
-                          stroke="hsl(var(--primary))"
+                          stroke="var(--primary)"
                           strokeWidth={1.6}
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -533,15 +533,15 @@ export function PartitionProjection({
           y1={y0 + drawH + 1}
           x2={x0 + drawW + 20}
           y2={y0 + drawH + 1}
-          stroke="hsl(var(--foreground))"
+          stroke="var(--foreground)"
           strokeOpacity={0.25}
           strokeWidth={0.8}
         />
 
         {/* ===== РАЗМЕРНЫЕ ЛИНИИ ===== */}
         {openingWidth > 0 && openingHeight > 0 && (() => {
-          const dimStroke = "hsl(var(--muted-foreground))";
-          const dimFill = "hsl(var(--muted-foreground))";
+          const dimStroke = "var(--muted-foreground)";
+          const dimFill = "var(--muted-foreground)";
           const tickW = 0.8;
           const lineW = 0.5;
           return (
